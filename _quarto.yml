@@ -6,11 +6,11 @@ execute:
   echo: true
 
 book:
-  title: "YOUR PROJECT TITLE"
+  title: "NYC Crime Stats"
   author:
-    - AUTHOR1 (UNI1)
-    - AUTHOR2 (UNI2)
-  repo-url: https://github.com/YOUR_GITHUB_ACCOUNT/REPO_NAME
+    - Austin Schaefer (as7082)
+    - Andy Kim (dk3315)
+  repo-url: https://github.com/schaefer30037/NYCCrimeStats
   date: today
   page-footer:
     right: |
