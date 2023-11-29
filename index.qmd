@@ -2,10 +2,13 @@
 
 
 
-
+Instructions (delete later):
 # Explain why you chose this topic, and the questions you are interested in studying. Provide context for readers who are not familiar with the topic.
 
+Instructions (delete later):
 # (suggested: 1 page)
+
+
 
 For visitors and people who are new to New York, safety often comes to mind. We'd like to identify any trends to see which areas/boroughs are actually dangerous. We are especially curious about this since we are also new to the city.
 
