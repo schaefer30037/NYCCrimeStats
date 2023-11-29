@@ -2,4 +2,93 @@
 
 ## Description
 
+# Identify one or more data sources (see II. D. above) that you propose to draw on for the project. For each, describe how the data are collected and by whom. Describe the format of the data, the frequency of updates, dimensions, and any other relevant information. Note any issues / problems with the data, either known or that you discover. Explain how you plan to import the data. Carefully document your sources with links to the precise data sources that you used. If that is not possible (for example if your data is not available online, then explain that clearly.)
+
+# (suggested: 1 page)
+
+This dataset includes all valid felony, misdemeanor, and violation crimes reported to the New York City Police Department (NYPD) for all complete quarters so far this year (2023). This data is manually extracted and reviewed by the Office of Management Analysis and Planning. 
+
+Each record represents a criminal complaint in NYC and includes information about the type of crime, the location and time of enforcement. In addition, information related to victim and suspect demographics is also included. 
+
+The data is provided by NYPD and is updated quarterly. It was made public in November 2018.
+
+We can download the data from the NYPD and import into R as a csv file. It can be downloaded from: https://data.cityofnewyork.us/Public-Safety/NYPD-Complaint-Data-Current-Year-To-Date-/5uac-w243/data
+
+
+There are 415310 rows and 36 columns. Important columns include:
+
+Location:
+
+- Precinct where incident occurred
+
+- Borough where incident occurred
+
+- Patrol borough in which incident occurred
+
+- Premise (grocery store, residence, street, etc)
+
+- Location at premise (inside premises, front of, rear of, etc)
+
+- Transit station name
+
+- Parks: NYC park, greenspace, playground, if applicable
+
+- NYCHA housing development level
+
+- Latitude/Longitude
+
+Crime details:
+
+- Date of incident
+
+- Time of incident
+
+- Level of offense (felony, misdemeanor, violation)
+
+- Crime success (indicates if crime was successful or failed)
+
+- Jurisdiction responsible for incident (ex: police, transit police, long island rail road, etc)
+
+Individuals' info:
+
+- Suspect's Age group
+
+- Suspect's race
+
+- Suspect's sex
+
+- Victim's age group
+
+- Victim's race
+
+- Victim's sex
+
+
+There are also end date and end time columns, which are populated if initial date and time are not known. 
+We will have to handle the rows where the exact timing of the crime is unknown.
+
+
+
+#Explain in detail how your data will enable you to answer your research questions from the introduction. 
+
+#(suggested: 1 page)
+
+We have details on the location, date, time, type of crime, premise, jurisdiction responsible, and crime success.
+We can look at the frequency of different crime levels across locations, premises, dates, and times.
+We can also compare different crime levels across victim age, race, and sex.
+We can also plot the frequency of successful crimes to failed ones across jurisdictions to analyze how often crimes are successful, 
+and which jurisdiction fails or succeeds to stop them.
+
+
 ## Missing value analysis
+
+#Describe any patterns you discover in missing values. If no values are missing, graphs should still be included showing that.
+
+
+#(suggested: 2 graphs plus commentary)
+
+```{r}
+#df <- read.csv('NYPD_Complaint_Data_Current__Year_To_Date_.csv')
+#df
+```
+
