@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -143,7 +177,11 @@ ul.task-list li input[type="checkbox"] {
    
   <ul>
   <li><a href="#description" id="toc-description" class="nav-link active" data-scroll-target="#description"><span class="header-section-number">2.1</span> Description</a></li>
-  <li><a href="#missing-value-analysis" id="toc-missing-value-analysis" class="nav-link" data-scroll-target="#missing-value-analysis"><span class="header-section-number">2.2</span> Missing value analysis</a></li>
+  <li><a href="#identify-one-or-more-data-sources-see-ii.-d.-above-that-you-propose-to-draw-on-for-the-project.-for-each-describe-how-the-data-are-collected-and-by-whom.-describe-the-format-of-the-data-the-frequency-of-updates-dimensions-and-any-other-relevant-information.-note-any-issues-problems-with-the-data-either-known-or-that-you-discover.-explain-how-you-plan-to-import-the-data.-carefully-document-your-sources-with-links-to-the-precise-data-sources-that-you-used.-if-that-is-not-possible-for-example-if-your-data-is-not-available-online-then-explain-that-clearly." id="toc-identify-one-or-more-data-sources-see-ii.-d.-above-that-you-propose-to-draw-on-for-the-project.-for-each-describe-how-the-data-are-collected-and-by-whom.-describe-the-format-of-the-data-the-frequency-of-updates-dimensions-and-any-other-relevant-information.-note-any-issues-problems-with-the-data-either-known-or-that-you-discover.-explain-how-you-plan-to-import-the-data.-carefully-document-your-sources-with-links-to-the-precise-data-sources-that-you-used.-if-that-is-not-possible-for-example-if-your-data-is-not-available-online-then-explain-that-clearly." class="nav-link" data-scroll-target="#identify-one-or-more-data-sources-see-ii.-d.-above-that-you-propose-to-draw-on-for-the-project.-for-each-describe-how-the-data-are-collected-and-by-whom.-describe-the-format-of-the-data-the-frequency-of-updates-dimensions-and-any-other-relevant-information.-note-any-issues-problems-with-the-data-either-known-or-that-you-discover.-explain-how-you-plan-to-import-the-data.-carefully-document-your-sources-with-links-to-the-precise-data-sources-that-you-used.-if-that-is-not-possible-for-example-if-your-data-is-not-available-online-then-explain-that-clearly."><span class="header-section-number">3</span> Identify one or more data sources (see II. D. above) that you propose to draw on for the project. For each, describe how the data are collected and by whom. Describe the format of the data, the frequency of updates, dimensions, and any other relevant information. Note any issues / problems with the data, either known or that you discover. Explain how you plan to import the data. Carefully document your sources with links to the precise data sources that you used. If that is not possible (for example if your data is not available online, then explain that clearly.)</a></li>
+  <li><a href="#suggested-1-page" id="toc-suggested-1-page" class="nav-link" data-scroll-target="#suggested-1-page"><span class="header-section-number">4</span> (suggested: 1 page)</a>
+  <ul class="collapse">
+  <li><a href="#missing-value-analysis" id="toc-missing-value-analysis" class="nav-link" data-scroll-target="#missing-value-analysis"><span class="header-section-number">4.1</span> Missing value analysis</a></li>
+  </ul></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/schaefer30037/NYCCrimeStats/edit/main/data.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/schaefer30037/NYCCrimeStats/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
@@ -170,10 +208,63 @@ ul.task-list li input[type="checkbox"] {
 <section id="description" class="level2" data-number="2.1">
 <h2 data-number="2.1" class="anchored" data-anchor-id="description"><span class="header-section-number">2.1</span> Description</h2>
 </section>
-<section id="missing-value-analysis" class="level2" data-number="2.2">
-<h2 data-number="2.2" class="anchored" data-anchor-id="missing-value-analysis"><span class="header-section-number">2.2</span> Missing value analysis</h2>
+<section id="identify-one-or-more-data-sources-see-ii.-d.-above-that-you-propose-to-draw-on-for-the-project.-for-each-describe-how-the-data-are-collected-and-by-whom.-describe-the-format-of-the-data-the-frequency-of-updates-dimensions-and-any-other-relevant-information.-note-any-issues-problems-with-the-data-either-known-or-that-you-discover.-explain-how-you-plan-to-import-the-data.-carefully-document-your-sources-with-links-to-the-precise-data-sources-that-you-used.-if-that-is-not-possible-for-example-if-your-data-is-not-available-online-then-explain-that-clearly." class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Identify one or more data sources (see II. D. above) that you propose to draw on for the project. For each, describe how the data are collected and by whom. Describe the format of the data, the frequency of updates, dimensions, and any other relevant information. Note any issues / problems with the data, either known or that you discover. Explain how you plan to import the data. Carefully document your sources with links to the precise data sources that you used. If that is not possible (for example if your data is not available online, then explain that clearly.)</h1>
+</section>
+<section id="suggested-1-page" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> (suggested: 1 page)</h1>
+<p>This dataset includes all valid felony, misdemeanor, and violation crimes reported to the New York City Police Department (NYPD) for all complete quarters so far this year (2023). This data is manually extracted and reviewed by the Office of Management Analysis and Planning.</p>
+<p>Each record represents a criminal complaint in NYC and includes information about the type of crime, the location and time of enforcement. In addition, information related to victim and suspect demographics is also included.</p>
+<p>The data is provided by NYPD and is updated quarterly. It was made public in November 2018.</p>
+<p>We can download the data from the NYPD and import into R as a csv file. It can be downloaded from: https://data.cityofnewyork.us/Public-Safety/NYPD-Complaint-Data-Current-Year-To-Date-/5uac-w243/data</p>
+<p>There are 415310 rows and 36 columns. Important columns include:</p>
+<p>Location:</p>
+<ul>
+<li><p>Precinct where incident occurred</p></li>
+<li><p>Borough where incident occurred</p></li>
+<li><p>Patrol borough in which incident occurred</p></li>
+<li><p>Premise (grocery store, residence, street, etc)</p></li>
+<li><p>Location at premise (inside premises, front of, rear of, etc)</p></li>
+<li><p>Transit station name</p></li>
+<li><p>Parks: NYC park, greenspace, playground, if applicable</p></li>
+<li><p>NYCHA housing development level</p></li>
+<li><p>Latitude/Longitude</p></li>
+</ul>
+<p>Crime details:</p>
+<ul>
+<li><p>Date of incident</p></li>
+<li><p>Time of incident</p></li>
+<li><p>Level of offense (felony, misdemeanor, violation)</p></li>
+<li><p>Crime success (indicates if crime was successful or failed)</p></li>
+<li><p>Jurisdiction responsible for incident (ex: police, transit police, long island rail road, etc)</p></li>
+</ul>
+<p>Individuals’ info:</p>
+<ul>
+<li><p>Suspect’s Age group</p></li>
+<li><p>Suspect’s race</p></li>
+<li><p>Suspect’s sex</p></li>
+<li><p>Victim’s age group</p></li>
+<li><p>Victim’s race</p></li>
+<li><p>Victim’s sex</p></li>
+</ul>
+<p>There are also end date and end time columns, which are populated if initial date and time are not known. We will have to handle the rows where the exact timing of the crime is unknown.</p>
+<p>#Explain in detail how your data will enable you to answer your research questions from the introduction.</p>
+<p>#(suggested: 1 page)</p>
+<p>We have details on the location, date, time, type of crime, premise, jurisdiction responsible, and crime success. We can look at the frequency of different crime levels across locations, premises, dates, and times. We can also compare different crime levels across victim age, race, and sex. We can also plot the frequency of successful crimes to failed ones across jurisdictions to analyze how often crimes are successful, and which jurisdiction fails or succeeds to stop them.</p>
+<section id="missing-value-analysis" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="missing-value-analysis"><span class="header-section-number">4.1</span> Missing value analysis</h2>
+<p>#Describe any patterns you discover in missing values. If no values are missing, graphs should still be included showing that.</p>
+<p>#(suggested: 2 graphs plus commentary)</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#df &lt;- read.csv('NYPD_Complaint_Data_Current__Year_To_Date_.csv')</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#df</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
