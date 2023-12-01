@@ -92,19 +92,19 @@ and which jurisdiction fails or succeeds to stop them.
 #(suggested: 2 graphs plus commentary)
 
 ```{r}
-df <- read.csv('../NYPD_Complaint_Data_Current__Year_To_Date_.csv')
+df <- read.csv('NYPD_Complaint_Data_Current__Year_To_Date_.csv')
 df[df == "(null)"] <- NA
 ```
 
 ```{r}
 is_na <- is.na(df)
-missing_counts <- colSums(is_na)
-plot_data <- data.frame(
-  column = names(missing_counts),
-  missing_count = missing_counts
+missing_counts_sum <- colSums(is_na)
+plot_data_sum <- data.frame(
+  column = names(missing_counts_sum),
+  missing_count = missing_counts_sum
 )
 
-plot_data$column <- factor(plot_data$column, levels = plot_data$column[order(plot_data$missing_count)])
+plot_data_sum$column <- factor(plot_data_sum$column, levels = plot_data_sum$column[order(plot_data_sum$missing_count)])
 ```
 
 
@@ -116,22 +116,22 @@ print(nrow(df))
 ```{r}
 library(ggplot2)
 
-ggplot(plot_data[plot_data$missing_count > 0, ], aes(x = column, y = missing_count)) +
+ggplot(plot_data_sum[plot_data_sum$missing_count > 0, ], aes(x = column, y = missing_count)) +
   geom_bar(stat = "identity", color = "black") +
   labs(title = "Number of missing values (All other columns have no mising values)", x = "Column Names", y = "Counts") +
   theme_minimal() +
   coord_flip()
 ```
 ```{r}
-missing_counts <- colMeans(is_na)
-plot_data <- data.frame(
-  column = names(missing_counts),
-  missing_count = missing_counts
+missing_counts_percent <- colMeans(is_na)
+plot_data_percent <- data.frame(
+  column = names(missing_counts_percent),
+  missing_count = missing_counts_percent
 )
 
-plot_data$column <- factor(plot_data$column, levels = plot_data$column[order(plot_data$missing_count)])
+plot_data_percent$column <- factor(plot_data_percent$column, levels = plot_data_percent$column[order(plot_data_percent$missing_count)])
 
-ggplot(plot_data[plot_data$missing_count > 0, ], aes(x = column, y = missing_count)) +
+ggplot(plot_data_percent[plot_data_percent$missing_count > 0, ], aes(x = column, y = missing_count)) +
   geom_bar(stat = "identity", color = "black") +
   labs(title = "Number of missing values (All other columns have no mising values)", x = "Column Names", y = "Percentage") +
   theme_minimal() +
@@ -142,7 +142,7 @@ ggplot(plot_data[plot_data$missing_count > 0, ], aes(x = column, y = missing_cou
 
 
 ```{r}
-ggplot(plot_data[plot_data$missing_count > 0 & plot_data$missing_count < 1000, ], aes(x = column, y = missing_count)) +
+ggplot(plot_data_sum[plot_data_sum$missing_count > 0 & plot_data_sum$missing_count < 1000, ], aes(x = column, y = missing_count)) +
   geom_bar(stat = "identity", color = "black") +
   labs(title = "Number of missing values ", x = "Column Names", y = "Counts") +
   theme_minimal() +
