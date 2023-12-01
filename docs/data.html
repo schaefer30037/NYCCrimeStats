@@ -203,8 +203,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="description" class="level2" data-number="2.1">
 <h2 data-number="2.1" class="anchored" data-anchor-id="description"><span class="header-section-number">2.1</span> Description</h2>
-<p>Instructions (delete later): # Identify one or more data sources (see II. D. above) that you propose to draw on for the project. For each, describe how the data are collected and by whom. Describe the format of the data, the frequency of updates, dimensions, and any other relevant information. Note any issues / problems with the data, either known or that you discover. Explain how you plan to import the data. Carefully document your sources with links to the precise data sources that you used. If that is not possible (for example if your data is not available online, then explain that clearly.)</p>
-<p>Instructions (delete later): #(suggested: 1 page)</p>
 <p>This dataset includes all valid felony, misdemeanor, and violation crimes reported to the New York City Police Department (NYPD) for all complete quarters so far this year (2023). This data is manually extracted and reviewed by the Office of Management Analysis and Planning.</p>
 <p>Each record represents a criminal complaint in NYC and includes information about the type of crime, the location and time of enforcement. In addition, information related to victim and suspect demographics is also included.</p>
 <p>The data is provided by NYPD and is updated quarterly. It was made public in November 2018.</p>
@@ -240,19 +238,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p>Victim’s sex</p></li>
 </ul>
 <p>There are also end date and end time columns, which are populated if initial date and time are not known. We will have to handle the rows where the exact timing of the crime is unknown.</p>
-<p>#Explain in detail how your data will enable you to answer your research questions from the introduction.</p>
-<p>#(suggested: 1 page)</p>
-<p>We have details on the location, date, time, type of crime, premise, jurisdiction responsible, and crime success. We can look at the frequency of different crime levels across locations, premises, dates, and times. We can also compare different crime levels across victim age, race, and sex. We can also plot the frequency of successful crimes to failed ones across jurisdictions to analyze how often crimes are successful, and which jurisdiction fails or succeeds to stop them.</p>
+<p>We have details on the location, date, time, type of crime, premise, jurisdiction responsible, and crime success. We can look at the frequency of different crime levels across locations, premises, dates, and times. The location information (including latitude, longitude, and precinct) would allow us to plot a heatmap on top of the NYC map (which we can access from publicly available datasets in the form of shapely files) and visualize which neighborhoods are most prone to crime and which types of crimes are more prone in certain areas. The temporal information (including the date and times) could allow us to plot a timeseries graph to uncover insights on seasonal changes on different types of crime. This will shed insight on what parts of the year or day of the week are prone to certain types of crimes. Not only that, we can also compare different crime levels across victim age, race, and sex to observe if there is a correlation between age, race and sex to chance of being victimized by crime. We can also plot the frequency of successful crimes to failed ones across jurisdictions to analyze how often crimes are successful, and which jurisdiction fails or succeeds to stop them. This would also allow us to see what type of crimes are least likely to be committed successfully and at which times of the year and what locations within NYC.</p>
 </section>
 <section id="missing-value-analysis" class="level2" data-number="2.2">
 <h2 data-number="2.2" class="anchored" data-anchor-id="missing-value-analysis"><span class="header-section-number">2.2</span> Missing value analysis</h2>
-<p>#Describe any patterns you discover in missing values. If no values are missing, graphs should still be included showing that.</p>
-<p>#(suggested: 2 graphs plus commentary)</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">'NYPD_Complaint_Data_Current__Year_To_Date_.csv'</span>)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>df[df <span class="sc">==</span> <span class="st">"(null)"</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>df[df <span class="sc">==</span> <span class="st">"(null)"</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">#df</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell">
@@ -260,65 +255,82 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>is_na <span class="ot">&lt;-</span> <span class="fu">is.na</span>(df)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>missing_counts_sum <span class="ot">&lt;-</span> <span class="fu">colSums</span>(is_na)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>plot_data_sum <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">column =</span> <span class="fu">names</span>(missing_counts_sum),</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">missing_count =</span> missing_counts_sum</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>plot_data_sum<span class="sc">$</span>column <span class="ot">&lt;-</span> <span class="fu">factor</span>(plot_data_sum<span class="sc">$</span>column, <span class="at">levels =</span> plot_data_sum<span class="sc">$</span>column[<span class="fu">order</span>(plot_data_sum<span class="sc">$</span>missing_count)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>missing_counts_percent <span class="ot">&lt;-</span> <span class="fu">colMeans</span>(is_na)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>plot_data_sum <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">column =</span> <span class="fu">names</span>(missing_counts_sum),</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">missing_count =</span> missing_counts_sum</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>plot_data_sum<span class="sc">$</span>column <span class="ot">&lt;-</span> <span class="fu">factor</span>(plot_data_sum<span class="sc">$</span>column, <span class="at">levels =</span> plot_data_sum<span class="sc">$</span>column[<span class="fu">order</span>(plot_data_sum<span class="sc">$</span>missing_count)])</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>plot_data_percent <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">column =</span> <span class="fu">names</span>(missing_counts_percent),</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">missing_count =</span> missing_counts_percent</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>plot_data_percent<span class="sc">$</span>column <span class="ot">&lt;-</span> <span class="fu">factor</span>(plot_data_percent<span class="sc">$</span>column, <span class="at">levels =</span> plot_data_percent<span class="sc">$</span>column[<span class="fu">order</span>(plot_data_percent<span class="sc">$</span>missing_count)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">nrow</span>(df))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#print(nrow(df))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 415310</code></pre>
-</div>
 </div>
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(plot_data_sum[plot_data_sum<span class="sc">$</span>missing_count <span class="sc">&gt;</span> <span class="dv">0</span>, ], <span class="fu">aes</span>(<span class="at">x =</span> column, <span class="at">y =</span> missing_count)) <span class="sc">+</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Number of missing values (All other columns have no mising values)"</span>, <span class="at">x =</span> <span class="st">"Column Names"</span>, <span class="at">y =</span> <span class="st">"Counts"</span>) <span class="sc">+</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(plot_data_sum[plot_data_sum<span class="sc">$</span>missing_count <span class="sc">&gt;</span> <span class="dv">0</span>, ], <span class="fu">aes</span>(<span class="at">x =</span> column, <span class="at">y =</span> missing_count)) <span class="sc">+</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Number of missing values (All other columns have no missing values)"</span>, <span class="at">x =</span> <span class="st">"Column Names"</span>, <span class="at">y =</span> <span class="st">"Counts"</span>) <span class="sc">+</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <p><img src="data_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
 </div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(plot_data_percent[plot_data_percent<span class="sc">$</span>missing_count <span class="sc">&gt;</span> <span class="dv">0</span>, ], <span class="fu">aes</span>(<span class="at">x =</span> column, <span class="at">y =</span> missing_count)) <span class="sc">+</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Percent of missing values (All other columns have no missing values)"</span>, <span class="at">x =</span> <span class="st">"Column Names"</span>, <span class="at">y =</span> <span class="st">"Percentage"</span>) <span class="sc">+</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="data_files/figure-html/unnamed-chunk-4-2.png" class="img-fluid" width="672"></p>
 </div>
+</div>
+<p>There are some columns with almost all values missing: Hadevelopt, Parks_nm, Transit_district, Station_name, Housing_psa</p>
+<p>Hadevelopt is the name of the housing development occurrence, and housing_psa is the development level code. This just means that almost all the crimes don’t happen around housing development. This makes sense since housing development in NYC is very scarce (one of the reasons housing is very expensive in the city).</p>
+<p>Parks_nm indicates if the crime happened in a park or playground, so null values indicate most crimes did not happen in these areas. The same reasoning can be applied for null values for Station_name (indicating a subway station) and transit_district (district code for subway station).</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>missing_counts_percent <span class="ot">&lt;-</span> <span class="fu">colMeans</span>(is_na)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>plot_data_percent <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">column =</span> <span class="fu">names</span>(missing_counts_percent),</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">missing_count =</span> missing_counts_percent</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>plot_data_percent<span class="sc">$</span>column <span class="ot">&lt;-</span> <span class="fu">factor</span>(plot_data_percent<span class="sc">$</span>column, <span class="at">levels =</span> plot_data_percent<span class="sc">$</span>column[<span class="fu">order</span>(plot_data_percent<span class="sc">$</span>missing_count)])</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(plot_data_percent[plot_data_percent<span class="sc">$</span>missing_count <span class="sc">&gt;</span> <span class="dv">0</span>, ], <span class="fu">aes</span>(<span class="at">x =</span> column, <span class="at">y =</span> missing_count)) <span class="sc">+</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Number of missing values (All other columns have no mising values)"</span>, <span class="at">x =</span> <span class="st">"Column Names"</span>, <span class="at">y =</span> <span class="st">"Percentage"</span>) <span class="sc">+</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>filtered_rows <span class="ot">&lt;-</span> df[<span class="fu">is.na</span>(df<span class="sc">$</span>LOC_OF_OCCUR_DESC), ]</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>category_counts <span class="ot">&lt;-</span> <span class="fu">table</span>(filtered_rows<span class="sc">$</span>PREM_TYP_DESC)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="fu">barplot</span>(category_counts[category_counts<span class="sc">&gt;</span><span class="dv">6000</span>], <span class="at">main=</span><span class="st">'Null premise location occurrences'</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">xlab =</span> <span class="st">'category'</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">ylab=</span> <span class="st">'count'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <p><img src="data_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<p>Loc_of_occur_desc indicates if a crime occurred inside, in front of, or behind a premise. We noticed the null values happen when the premise is either the street or an NYC subway, so the exact location around the premises doesn’t make sense.</p>
+<p>Let’s use another plot to examine the smaller missing values.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(plot_data_sum[plot_data_sum<span class="sc">$</span>missing_count <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">&amp;</span> plot_data_sum<span class="sc">$</span>missing_count <span class="sc">&lt;</span> <span class="dv">1000</span>, ], <span class="fu">aes</span>(<span class="at">x =</span> column, <span class="at">y =</span> missing_count)) <span class="sc">+</span></span>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(plot_data_sum[plot_data_sum<span class="sc">$</span>missing_count <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">&amp;</span> plot_data_sum<span class="sc">$</span>missing_count <span class="sc">&lt;</span> <span class="dv">60000</span>, ], <span class="fu">aes</span>(<span class="at">x =</span> column, <span class="at">y =</span> missing_count)) <span class="sc">+</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Number of missing values "</span>, <span class="at">x =</span> <span class="st">"Column Names"</span>, <span class="at">y =</span> <span class="st">"Counts"</span>) <span class="sc">+</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Number of missing values (below 60000)"</span>, <span class="at">x =</span> <span class="st">"Column Names"</span>, <span class="at">y =</span> <span class="st">"Counts"</span>) <span class="sc">+</span></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -326,6 +338,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="data_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<p>The count of missing values for suspect sex, race, and age group are the same. This indicates that the suspect got away with the crime. We should examine this data later to see if there is a trend for suspects who escaped.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(plot_data_sum[plot_data_sum<span class="sc">$</span>missing_count <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">&amp;</span> plot_data_sum<span class="sc">$</span>missing_count <span class="sc">&lt;</span> <span class="dv">700</span>, ], <span class="fu">aes</span>(<span class="at">x =</span> column, <span class="at">y =</span> missing_count)) <span class="sc">+</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Number of missing values (below 700)"</span>, <span class="at">x =</span> <span class="st">"Column Names"</span>, <span class="at">y =</span> <span class="st">"Counts"</span>) <span class="sc">+</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="data_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The rest of these missing values are very minimal compared to amount of data we have.</p>
 
 
 </section>
