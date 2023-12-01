@@ -77,6 +77,9 @@ We can also plot the frequency of successful crimes to failed ones across jurisd
 
 ## Missing value analysis
 
+Here we will plot only the columns that have null values. The other columns don't have any null values:
+
+
 ```{r}
 df <- read.csv('NYPD_Complaint_Data_Current__Year_To_Date_.csv')
 df[df == "(null)"] <- NA
@@ -116,13 +119,13 @@ library(ggplot2)
 
 ggplot(plot_data_sum[plot_data_sum$missing_count > 0, ], aes(x = column, y = missing_count)) +
   geom_bar(stat = "identity", color = "black") +
-  labs(title = "Number of missing values (All other columns have no missing values)", x = "Column Names", y = "Counts") +
+  labs(title = "Number of missing values", x = "Column Names", y = "Counts") +
   theme_minimal() +
   coord_flip()
 
 ggplot(plot_data_percent[plot_data_percent$missing_count > 0, ], aes(x = column, y = missing_count)) +
   geom_bar(stat = "identity", color = "black") +
-  labs(title = "Percent of missing values (All other columns have no missing values)", x = "Column Names", y = "Percentage") +
+  labs(title = "Percent of missing values", x = "Column Names", y = "Percentage") +
   theme_minimal() +
   coord_flip()
 
