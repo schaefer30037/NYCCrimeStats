@@ -4,7 +4,7 @@
 
 
 
-  This dataset includes all valid felony, misdemeanor, and violation crimes reported to the New York City Police Department (NYPD) for all complete quarters so far this year (2023). This data is manually extracted and reviewed by the Office of Management Analysis and Planning. 
+This dataset includes all valid felony, misdemeanor, and violation crimes reported to the New York City Police Department (NYPD) for all complete quarters so far this year (2023). This data is manually extracted and reviewed by the Office of Management Analysis and Planning. 
 
 Each record represents a criminal complaint in NYC and includes information about the type of crime, the location and time of enforcement. In addition, information related to victim and suspect demographics is also included. 
 
