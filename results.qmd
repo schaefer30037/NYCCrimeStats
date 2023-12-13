@@ -3,10 +3,10 @@
 origin_df <- read.csv('../NYPD_Complaint_Data_Current__Year_To_Date_.csv')
 origin_df[origin_df == "(null)"] <- NA
 origin_df[origin_df == "UNKNOWN"] <- NA
-df <- origin_df
 ```
 
 ```{r}
+df <- origin_df
 Sys.setenv(LANG = "en")
 ```
 
@@ -60,7 +60,58 @@ library(dplyr)
 
 
 ```{r}
+value_counts <- table(df$BORO_NM)
+count_df <- data.frame(Category = names(value_counts), Count = as.numeric(value_counts))
+count_df$Pop <- c(1427000, 2577000, 1629000, 2271000, 475596)
+count_df$CrimePerPop <- count_df$Count*100 / count_df$Pop
+count_df <- count_df[count_df$CrimePerPop > 0,]
 
+count_df <- count_df[order(count_df$CrimePerPop), ]
+ggplot(count_df, aes(x = CrimePerPop, y = reorder(Category, CrimePerPop))) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  labs(title = "Ratio of Crimes to population by Borough",
+       x = "Crime/Capita ()",
+       y = "Borough") +
+  theme_minimal() 
+```
+
+
+
+
+```{r}
+value_counts <- table(df$LAW_CAT_CD)
+
+count_df <- data.frame(Category = names(value_counts), Count = as.numeric(value_counts))
+count_df <- count_df[count_df$Count > 0,]
+
+
+ggplot(count_df, aes(y = Count, x = Category)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  labs(title = "Frequency of Crimes by Severity",
+       y = "Frequency",
+       x = "Crime Severity") +
+  theme_minimal() 
+```
+
+```{r}
+value_counts <- table(df[, c("OFNS_DESC", "LAW_CAT_CD")])
+count_df <- data.frame(value_counts)
+count_df$OFNS_DESC <- paste(count_df$OFNS_DESC, count_df$LAW_CAT_CD, sep = " ")
+count_df <- count_df[count_df$Freq > 4000,]
+
+count_df <- count_df[order(count_df$Freq), ]
+
+ggplot(count_df, aes(x = Freq, y = reorder(OFNS_DESC, Freq), fill = LAW_CAT_CD)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Frequency of Crimes by Type",
+       y = "Crime Type",
+       x = "Frequency") +
+  theme_minimal() 
+
+```
+
+
+```{r}
 value_counts <- table(df$PREM_TYP_DESC)
 
 count_df <- data.frame(Category = names(value_counts), Count = as.numeric(value_counts))
@@ -76,6 +127,37 @@ ggplot(count_df, aes(x = Count, y = reorder(Category, Count))) +
   theme_minimal() 
 ```
 
+```{r}
+library(stringr)
+value_counts <- table(df[, c("OFNS_DESC", "PREM_TYP_DESC")])
+count_df <- data.frame(value_counts)
+
+result <- count_df %>%
+  group_by(PREM_TYP_DESC) %>%
+  summarise(total_value = sum(Freq))
+
+count_df <- merge(count_df, result, by = "PREM_TYP_DESC")
+count_df$ratio <- count_df$Freq*100 / count_df$total_value
+count_df <- count_df[count_df$total_value > 7000,]
+count_df <- count_df[count_df$ratio > 12,]
+count_df$OFNS_DESC <- str_wrap(count_df$OFNS_DESC, width = 10)
+count_df$PREM_TYP_DESC <- str_wrap(count_df$PREM_TYP_DESC, width = 10)
+
+ggplot(count_df, aes(x = ratio, y = OFNS_DESC, fill = OFNS_DESC)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~PREM_TYP_DESC, scales = "free",ncol = 4) +
+  labs(title = "Faceted Bar Plots", x = "Category2", y = "Value") +
+  theme_minimal() + 
+  theme( 
+        strip.text = element_text(size = 7), 
+        axis.text.y = element_text(size = 7)
+        ) + 
+  guides(fill = FALSE) + 
+  coord_cartesian(xlim = c(0, 100))
+```
+
+
+
 
 
 
@@ -84,6 +166,7 @@ library(vcd)
 filtered_df <- df[df$SUSP_SEX != 'U',]
 mosaicplot(table(filtered_df$LAW_CAT_CD, filtered_df$SUSP_SEX), main = "Mosaic Plot of Suspect Age and Crime Category", color = c("salmon", "lightblue"))
 ```
+
 ```{r}
 filtered_df <- df[df$SUSP_SEX != 'U',]
 mosaicplot(table(filtered_df$LAW_CAT_CD, filtered_df$SUSP_SEX), main = "Mosaic Plot of Suspect Age and Crime Category", color = c("salmon", "lightblue"))
