@@ -1,1 +1,98 @@
 # Results
+```{r}
+origin_df <- read.csv('../NYPD_Complaint_Data_Current__Year_To_Date_.csv')
+origin_df[origin_df == "(null)"] <- NA
+origin_df[origin_df == "UNKNOWN"] <- NA
+df <- origin_df
+```
+
+```{r}
+Sys.setenv(LANG = "en")
+```
+
+
+```{r}
+# Removing useless columns and preprocessing
+cols_to_remove <- c('HADEVELOPT', 'PARKS_NM', 'TRANSIT_DISTRICT','STATION_NAME',
+                    'HOUSING_PSA', 'CMPLNT_NUM', 
+                    'JURISDICTION_CODE','KY_CD','PD_CD','RPT_DT','ADDR_PCT_CD')
+df <- df[, !(names(df) %in% cols_to_remove)]
+
+df$Date <- as.Date(df$CMPLNT_FR_DT, format = "%m/%d/%Y")
+df$CMPLNT_FR_TM <- strptime(df$CMPLNT_FR_TM, format = "%H:%M:%S")
+df$Hour <- format(df$CMPLNT_FR_TM, format = "%H")
+df$Hour <- as.integer(df$Hour)
+
+cols_to_remove <- c('CMPLNT_FR_TM', 'CMPLNT_TO_DT','CMPLNT_TO_TM', 'CMPLNT_FR_DT')
+df <- df[, !(names(df) %in% cols_to_remove)]
+```
+
+```{r}
+library(ggplot2)
+
+df <- df[order(df$Date), ]
+
+ggplot(df, aes(x = Date)) +
+  geom_histogram(binwidth = 7, fill = "skyblue", color = "black", alpha = 0.7) +
+  geom_vline(xintercept = as.Date("2023-01-01"), linetype = "dashed", color = "red", linewidth = 1) +
+  labs(title = "Date Counts Histogram", x = "Date", y = "Count") +
+  xlim(as.Date('2022-01-01'), max(df$Date)) +
+  theme_minimal()
+```
+
+```{r}
+library(lubridate)
+df <- df[df$Date >= as.Date('2023-01-01'), ]
+df$Month <- month(df$Date)
+df$Month <- as.integer(df$Month)
+df
+```
+
+
+
+```{r}
+library(vcdExtra)
+library(ggplot2)
+library(forcats)
+library(dplyr)
+```
+
+
+
+```{r}
+
+value_counts <- table(df$PREM_TYP_DESC)
+
+count_df <- data.frame(Category = names(value_counts), Count = as.numeric(value_counts))
+count_df <- count_df[count_df$Count > 7000,]
+
+
+count_df <- count_df[order(count_df$Count), ]
+ggplot(count_df, aes(x = Count, y = reorder(Category, Count))) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  labs(title = "Frequency of Crimes at Premise Type",
+       x = "Frequency",
+       y = "Premise Type") +
+  theme_minimal() 
+```
+
+
+
+
+```{r}
+library(vcd)
+filtered_df <- df[df$SUSP_SEX != 'U',]
+mosaicplot(table(filtered_df$LAW_CAT_CD, filtered_df$SUSP_SEX), main = "Mosaic Plot of Suspect Age and Crime Category", color = c("salmon", "lightblue"))
+```
+```{r}
+filtered_df <- df[df$SUSP_SEX != 'U',]
+mosaicplot(table(filtered_df$LAW_CAT_CD, filtered_df$SUSP_SEX), main = "Mosaic Plot of Suspect Age and Crime Category", color = c("salmon", "lightblue"))
+```
+
+
+
+
+
+
+
+
