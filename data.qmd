@@ -10,7 +10,7 @@ Each record represents a criminal complaint in NYC and includes information abou
 
 The data is provided by NYPD and is updated quarterly. It was made public in November 2018.
 
-We can download the data from the NYPD and import into R as a csv file. It can be downloaded from: https://data.cityofnewyork.us/Public-Safety/NYPD-Complaint-Data-Current-Year-To-Date-/5uac-w243/data
+We can download the data from the NYPD and import into R as a csv file. Go to "export", then download as CSV. It can be downloaded from: https://data.cityofnewyork.us/Public-Safety/NYPD-Complaint-Data-Current-Year-To-Date-/5uac-w243/data
 
 
 There are 415310 rows and 36 columns. Important columns include:
@@ -137,6 +137,7 @@ Hadevelopt is the name of the housing development occurrence, and housing_psa is
 
 Parks_nm indicates if the crime happened in a park or playground, so null values indicate most crimes did not happen in these areas. The same reasoning can be applied for null values for Station_name (indicating a subway station) and transit_district (district code for subway station).
 
+For these columns, missing values just indicates the crime did not occur at that particular location. Since almost all the values are missing, we can drop these columns. We have another column that describes the location of the crime, so we aren't losing any valuable information by dropping these.
 
 
 
@@ -150,7 +151,7 @@ barplot(category_counts[category_counts>6000], main='Null premise location occur
 
 
 ```
-Loc_of_occur_desc indicates if a crime occurred inside, in front of, or behind a premise. We noticed the null values happen when the premise is either the street or an NYC subway, so the exact location around the premises doesn't make sense.
+Loc_of_occur_desc indicates if a crime occurred inside, in front of, or behind a premise. We noticed the null values happen when the premise is either the street or an NYC subway, so the exact location around the premises doesn't make sense. We can probably drop this column since the information is not that useful.
 
 
 Let's use another plot to examine the smaller missing values.
@@ -164,7 +165,7 @@ ggplot(plot_data_sum[plot_data_sum$missing_count > 0 & plot_data_sum$missing_cou
 
 
 ```
-The count of missing values for suspect sex, race, and age group are the same. This indicates that the suspect got away with the crime. We should examine this data later to see if there is a trend for suspects who escaped.
+The count of missing values for suspect sex, race, and age group are the same. This indicates that the suspect got away with the crime. We should examine this data later to see if there is a trend for suspects who escaped, so let's keep these missing values.
 
 
 ```{r}
@@ -175,7 +176,7 @@ ggplot(plot_data_sum[plot_data_sum$missing_count > 0 & plot_data_sum$missing_cou
   coord_flip()
 ```
 
-The rest of these missing values are very minimal compared to amount of data we have.
+The rest of these missing values are very minimal compared to amount of data we have. We can just drop these rows since missing values make up only about 1% for these features.
 
 
 
