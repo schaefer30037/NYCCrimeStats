@@ -1,6 +1,15 @@
 # Results
 ```{r}
-origin_df <- read.csv('../NYPD_Complaint_Data_Current__Year_To_Date_.csv')
+library(vcdExtra)
+library(ggplot2)
+library(dplyr)
+library(ggplot2)
+library(vcd)
+library(stringr)
+library(lubridate)
+library(forcats)
+
+origin_df <- read.csv('NYPD_Complaint_Data_Current__Year_To_Date_.csv')
 origin_df[origin_df == "(null)"] <- NA
 origin_df[origin_df == "UNKNOWN"] <- NA
 ```
@@ -14,21 +23,22 @@ Sys.setenv(LANG = "en")
 ```{r}
 # Removing useless columns and preprocessing
 cols_to_remove <- c('HADEVELOPT', 'PARKS_NM', 'TRANSIT_DISTRICT','STATION_NAME',
-                    'HOUSING_PSA', 'CMPLNT_NUM', 
+                    'HOUSING_PSA', 'CMPLNT_NUM', 'LOC_OF_OCCUR_DESC',
                     'JURISDICTION_CODE','KY_CD','PD_CD','RPT_DT','ADDR_PCT_CD')
 df <- df[, !(names(df) %in% cols_to_remove)]
 
 df$Date <- as.Date(df$CMPLNT_FR_DT, format = "%m/%d/%Y")
 df$CMPLNT_FR_TM <- strptime(df$CMPLNT_FR_TM, format = "%H:%M:%S")
 df$Hour <- format(df$CMPLNT_FR_TM, format = "%H")
+
 df$Hour <- as.integer(df$Hour)
+
 
 cols_to_remove <- c('CMPLNT_FR_TM', 'CMPLNT_TO_DT','CMPLNT_TO_TM', 'CMPLNT_FR_DT')
 df <- df[, !(names(df) %in% cols_to_remove)]
 ```
 
 ```{r}
-library(ggplot2)
 
 df <- df[order(df$Date), ]
 
@@ -41,39 +51,96 @@ ggplot(df, aes(x = Date)) +
 ```
 
 ```{r}
-library(lubridate)
 df <- df[df$Date >= as.Date('2023-01-01'), ]
 df$Month <- month(df$Date)
-df$Month <- as.integer(df$Month)
-df
+# df$Month <- as.integer(df$Month)
+df$Month <- factor(month.name[df$Month], levels = month.name)
+# df
 ```
-
 
 
 ```{r}
-library(vcdExtra)
-library(ggplot2)
-library(forcats)
-library(dplyr)
+ggplot(df, aes(x = Month, fill = fct_rev(factor(LAW_CAT_CD)))) +
+  geom_bar() +
+  labs(title = "Crimes per month", x = "Month", y = "Frequency", fill = "Severity") +
+scale_fill_manual(values = c("#BF0000", "#7F0000", "#3B0000"))
+
+# ggplot(data = df, aes(x=Month)) +
+#   geom_bar(color = "black") +
+#   labs(title='Crimes per month faceted by offense') +
+#   geom_text(stat = "count", aes(label=after_stat(count)), vjust = -0.25, size = 3) +
+#   facet_wrap(facets = vars(LAW_CAT_CD), nrow = 3) +  # , scales = "free_y" ?
+#   ylim(0, 27500) +
+#   theme_bw()
+
+
 ```
 
 
+```{r}
+month_contingency_table <- table(df$Month)
+month_contingency_table <- month_contingency_table[month_contingency_table>0]
+
+month_chi_sq <- chisq.test(month_contingency_table)
+# print(month_contingency_table)
+print(month_chi_sq)
+
+```
+
+
+```{r}
+ggplot(df, aes(x = factor(Hour), color = LAW_CAT_CD, group = LAW_CAT_CD)) +
+  geom_point(stat = "count", size = 3) +
+  geom_line(stat = "count", aes(group = LAW_CAT_CD), size = 1) +
+  labs(title = "Crimes over time",
+       x = "Time (Hour)", y = "Count", fill="Severity") +
+  scale_color_manual(values = c( "#3B0000", "#AF0000", "#FF0000")) +
+  scale_x_discrete(breaks = seq(0, 24, by = 5), labels = function(x) sprintf("%02d:00", as.numeric(x))) +
+  theme_minimal()
+```
+
+
+2022 population estimates were taken from: https://www.nyc.gov/site/planning/planning-level/nyc-population/nyc-population-current-estimates.page
 
 ```{r}
 value_counts <- table(df$BORO_NM)
 count_df <- data.frame(Category = names(value_counts), Count = as.numeric(value_counts))
-count_df$Pop <- c(1427000, 2577000, 1629000, 2271000, 475596)
+population <- c(1379946, 2590516, 1596273, 2278029, 491133)
+count_df$Pop <- population
 count_df$CrimePerPop <- count_df$Count*100 / count_df$Pop
 count_df <- count_df[count_df$CrimePerPop > 0,]
-
 count_df <- count_df[order(count_df$CrimePerPop), ]
-ggplot(count_df, aes(x = CrimePerPop, y = reorder(Category, CrimePerPop))) +
-  geom_bar(stat = "identity", fill = "skyblue") +
-  labs(title = "Ratio of Crimes to population by Borough",
-       x = "Crime/Capita ()",
-       y = "Borough") +
-  theme_minimal() 
+# ggplot(count_df, aes(x = CrimePerPop, y = reorder(Category, CrimePerPop))) +
+#   geom_bar(stat = "identity", fill = "skyblue") +
+#   labs(title = "Ratio of Crimes to population by Borough",
+#        x = "Crime/Capita ()",
+#        y = "Borough") +
+#   theme_minimal()
+
+
+crime_counts <- df %>%
+  group_by(BORO_NM, LAW_CAT_CD) %>%
+  summarise(CrimeCount = n()) %>%
+  ungroup()
+colnames(crime_counts)[colnames(crime_counts) == "BORO_NM"] <- "Category"
+crime_counts <- merge(crime_counts, count_df, by='Category', all.x=TRUE)
+crime_counts <- crime_counts[, c('Category', 'LAW_CAT_CD', 'CrimeCount', 'Pop')]
+crime_counts <- crime_counts[!crime_counts$Category %in% NA,]
+crime_counts$CrimePerPop <- 100000*crime_counts$CrimeCount/crime_counts$Pop
+
+
+
+ggplot(crime_counts, aes(x = CrimePerPop, y = reorder(Category, CrimePerPop), fill = fct_rev(LAW_CAT_CD))) +
+  geom_bar(stat = "identity") +
+  labs(title = "Crime per Capita by Borough",
+       x = "Crime per Capita",
+       y = "Borough",
+       fill = "Severity") +
+  scale_fill_manual(values = c( "#FF0000", "#AF0000", "#3B0000"))+
+  theme_minimal()
+
 ```
+
 
 
 
@@ -92,6 +159,17 @@ ggplot(count_df, aes(y = Count, x = Category)) +
        x = "Crime Severity") +
   theme_minimal() 
 ```
+According to nycourts.gov and nyc.gov, these are the definitions of the different severity levels:
+https://www.nycourts.gov/courthelp/criminal/typesCriminalCases.shtml
+https://www.nyc.gov/site/nypd/services/victim-services/glossary.page
+
+Violation: Any non-criminal offense, other than traffic infractions. An offense punishable by up to a $250 fine or up to 15 days in jail. Examples of common violations include disorderly conduct and trespassing.
+
+Misdemeanor: A misdemeanor is the lowest level of crime. It is more serious than a violation, but less serious than a felony. It is a crime punishable by probation, a fine, or up to one year in jail.
+
+Felony: The most serious types of crimes. Examples of felonies include murder, rape, robbery, arson, and selling/possessing controlled substances. It is punishable by imprisonment for more than one year, or as long as life imprisonment.
+
+
 
 ```{r}
 value_counts <- table(df[, c("OFNS_DESC", "LAW_CAT_CD")])
@@ -103,13 +181,15 @@ count_df <- count_df[order(count_df$Freq), ]
 
 ggplot(count_df, aes(x = Freq, y = reorder(OFNS_DESC, Freq), fill = LAW_CAT_CD)) +
   geom_bar(stat = "identity") +
-  labs(title = "Frequency of Crimes by Type",
+  labs(title = "Most Common Crimes",
        y = "Crime Type",
-       x = "Frequency") +
+       x = "Frequency",
+       fill="Severity") +
+  scale_fill_manual(values = c( "#3B0000", "#AF0000", "#FF0000")) +
   theme_minimal() 
 
 ```
-
+Larceny more likely to occur during the day when stores are open. Same with harassment since there are more people walking around.
 
 ```{r}
 value_counts <- table(df$PREM_TYP_DESC)
@@ -119,16 +199,29 @@ count_df <- count_df[count_df$Count > 7000,]
 
 
 count_df <- count_df[order(count_df$Count), ]
-ggplot(count_df, aes(x = Count, y = reorder(Category, Count))) +
-  geom_bar(stat = "identity", fill = "skyblue") +
-  labs(title = "Frequency of Crimes at Premise Type",
-       x = "Frequency",
-       y = "Premise Type") +
-  theme_minimal() 
+
+
+# ggplot(count_df, aes(x = Count, y = reorder(Category, Count))) +
+#   geom_bar(stat = "identity", fill = "skyblue") +
+#   labs(title = "Frequency of Crimes at Premise Type",
+#        x = "Frequency",
+#        y = "Premise Type") +
+#   theme_minimal() 
+
+
+count_premise_df <- df %>% count(PREM_TYP_DESC)
+filtered_df <- count_premise_df[count_premise_df$n > 7000, ]
+filtered_df <- filtered_df %>% na.omit()
+df$PREM_TYP_DESC <- fct_rev(fct_infreq(df$PREM_TYP_DESC))
+
+
+ggplot(df[df$PREM_TYP_DESC %in% filtered_df$PREM_TYP_DESC,], aes(y = PREM_TYP_DESC, fill = fct_rev(factor(LAW_CAT_CD)))) +
+  geom_bar() +
+  labs(title = "Frequency of Crimes at Premise",x="Frequency", y = "Premise Type", fill = "Severity") +
+scale_fill_manual(values = c("#FF0000", "#AF0000", "#3B0000"))
 ```
 
 ```{r}
-library(stringr)
 value_counts <- table(df[, c("OFNS_DESC", "PREM_TYP_DESC")])
 count_df <- data.frame(value_counts)
 
@@ -146,7 +239,7 @@ count_df$PREM_TYP_DESC <- str_wrap(count_df$PREM_TYP_DESC, width = 10)
 ggplot(count_df, aes(x = ratio, y = OFNS_DESC, fill = OFNS_DESC)) +
   geom_bar(stat = "identity", position = "dodge") +
   facet_wrap(~PREM_TYP_DESC, scales = "free",ncol = 4) +
-  labs(title = "Faceted Bar Plots", x = "Category2", y = "Value") +
+  labs(title = "Proportion of offense types across premises", x = "Percent(%)", y = "Type of Offense") +
   theme_minimal() + 
   theme( 
         strip.text = element_text(size = 7), 
@@ -162,20 +255,81 @@ ggplot(count_df, aes(x = ratio, y = OFNS_DESC, fill = OFNS_DESC)) +
 
 
 ```{r}
-library(vcd)
-filtered_df <- df[df$SUSP_SEX != 'U',]
-mosaicplot(table(filtered_df$LAW_CAT_CD, filtered_df$SUSP_SEX), main = "Mosaic Plot of Suspect Age and Crime Category", color = c("salmon", "lightblue"))
+# susp_sex_df <- df[df$SUSP_SEX != 'U',]
+# mosaicplot(table(susp_sex_df$LAW_CAT_CD, susp_sex_df$SUSP_SEX), main = "Mosaic Plot of Suspect Age and Crime Category", color = c("salmon", "lightblue"))
 ```
+```{r}
+susp_df <- df[df$SUSP_SEX != 'U',]
+susp_df <- susp_df[susp_df$SUSP_AGE_GROUP %in% c('<18','18-24','25-44','45-64', '65+'),]
+colnames(susp_df)[colnames(susp_df) == "SUSP_AGE_GROUP"] <- "Suspect_Age_Group"
+colnames(susp_df)[colnames(susp_df) == "SUSP_SEX"] <- "Suspect_Sex"
+colnames(susp_df)[colnames(susp_df) == "SUSP_RACE"] <- "Suspect_Race"
+
+susp_df %>%
+  vcd::mosaic(fct_rev(LAW_CAT_CD) ~ Suspect_Age_Group + Suspect_Sex, 
+              data = .,
+              direction = c("v", "v", "h"),
+              main = 'Suspect Age Group and Sex',
+              labeling = labeling_border(
+                      xlab = "lab",
+                       gp_labels = gpar(fontsize = 8),
+                       rot_labels = c(0,0,0,0),
+                       offset_label =c(0,0,0,-0.75),
+                       varnames = c(TRUE, TRUE, FALSE),
+                       just_labels=c("center","right")
+                       ))
+
+susp_df %>%
+  vcd::mosaic(fct_rev(LAW_CAT_CD) ~ Suspect_Race + Suspect_Sex, 
+              data = .,
+              direction = c("v", "v", "h"),
+              main = 'Suspect Race and Sex',
+              labeling = labeling_border(
+                      xlab = "lab",
+                       gp_labels = gpar(fontsize = 6.5),
+                       rot_labels = c(30,0,0,0),
+                       offset_label =c(1.2,0,0,-0.75),
+                       varnames = c(FALSE, TRUE, FALSE),
+                       just_labels=c("center","right")
+                       ))
+```
+
 
 ```{r}
-filtered_df <- df[df$SUSP_SEX != 'U',]
-mosaicplot(table(filtered_df$LAW_CAT_CD, filtered_df$SUSP_SEX), main = "Mosaic Plot of Suspect Age and Crime Category", color = c("salmon", "lightblue"))
+vic_df <- df[!df$VIC_SEX %in% c('U', 'D', 'E', 'L'),]
+vic_df <- vic_df[vic_df$VIC_AGE_GROUP %in% c('<18','18-24','25-44','45-64', '65+'),]
+colnames(vic_df)[colnames(vic_df) == "VIC_AGE_GROUP"] <- "Victim_Age_Group"
+colnames(vic_df)[colnames(vic_df) == "VIC_SEX"] <- "Victim_Sex"
+colnames(vic_df)[colnames(vic_df) == "VIC_RACE"] <- "Victim_Race"
+
+
+vic_df %>%
+  vcd::mosaic(fct_rev(LAW_CAT_CD) ~ Victim_Age_Group + Victim_Sex, 
+              data = .,
+              direction = c("v", "v", "h"),
+              main = 'Victim Age Group and Sex',
+              labeling = labeling_border(
+                      xlab = "lab",
+                       gp_labels = gpar(fontsize = 8),
+                       rot_labels = c(0,0,0,0),
+                       offset_label =c(0,0,0,-0.75),
+                       varnames = c(TRUE, TRUE, FALSE),
+                       just_labels=c("center","right")
+                       ))
+
+vic_df %>%
+  vcd::mosaic(fct_rev(LAW_CAT_CD) ~ Victim_Race + Victim_Sex, 
+              data = .,
+              direction = c("v", "v", "h"),
+              main = 'Victim Race and Sex',
+              labeling = labeling_border(
+                      xlab = "lab",
+                       gp_labels = gpar(fontsize = 6.5),
+                       rot_labels = c(30,0,0,0),
+                       offset_label =c(1.5,0,0,-0.75),
+                       varnames = c(FALSE, TRUE, FALSE),
+                       just_labels=c("center","right")
+                       ))
+
 ```
-
-
-
-
-
-
-
 

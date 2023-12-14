@@ -206,7 +206,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>This dataset includes all valid felony, misdemeanor, and violation crimes reported to the New York City Police Department (NYPD) for all complete quarters so far this year (2023). This data is manually extracted and reviewed by the Office of Management Analysis and Planning.</p>
 <p>Each record represents a criminal complaint in NYC and includes information about the type of crime, the location and time of enforcement. In addition, information related to victim and suspect demographics is also included.</p>
 <p>The data is provided by NYPD and is updated quarterly. It was made public in November 2018.</p>
-<p>We can download the data from the NYPD and import into R as a csv file. It can be downloaded from: https://data.cityofnewyork.us/Public-Safety/NYPD-Complaint-Data-Current-Year-To-Date-/5uac-w243/data</p>
+<p>We can download the data from the NYPD and import into R as a csv file. Go to “export”, then download as CSV. It can be downloaded from: https://data.cityofnewyork.us/Public-Safety/NYPD-Complaint-Data-Current-Year-To-Date-/5uac-w243/data</p>
 <p>There are 415310 rows and 36 columns. Important columns include:</p>
 <p>Location:</p>
 <ul>
@@ -310,6 +310,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>There are some columns with almost all values missing: Hadevelopt, Parks_nm, Transit_district, Station_name, Housing_psa</p>
 <p>Hadevelopt is the name of the housing development occurrence, and housing_psa is the development level code. This just means that almost all the crimes don’t happen around housing development. This makes sense since housing development in NYC is very scarce (one of the reasons housing is very expensive in the city).</p>
 <p>Parks_nm indicates if the crime happened in a park or playground, so null values indicate most crimes did not happen in these areas. The same reasoning can be applied for null values for Station_name (indicating a subway station) and transit_district (district code for subway station).</p>
+<p>For these columns, missing values just indicates the crime did not occur at that particular location. Since almost all the values are missing, we can drop these columns. We have another column that describes the location of the crime, so we aren’t losing any valuable information by dropping these.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -324,7 +325,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="data_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>Loc_of_occur_desc indicates if a crime occurred inside, in front of, or behind a premise. We noticed the null values happen when the premise is either the street or an NYC subway, so the exact location around the premises doesn’t make sense.</p>
+<p>Loc_of_occur_desc indicates if a crime occurred inside, in front of, or behind a premise. We noticed the null values happen when the premise is either the street or an NYC subway, so the exact location around the premises doesn’t make sense. We can probably drop this column since the information is not that useful.</p>
 <p>Let’s use another plot to examine the smaller missing values.</p>
 <div class="cell">
 <details>
@@ -339,7 +340,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="data_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>The count of missing values for suspect sex, race, and age group are the same. This indicates that the suspect got away with the crime. We should examine this data later to see if there is a trend for suspects who escaped.</p>
+<p>The count of missing values for suspect sex, race, and age group are the same. This indicates that the suspect got away with the crime. We should examine this data later to see if there is a trend for suspects who escaped, so let’s keep these missing values.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -353,7 +354,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="data_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>The rest of these missing values are very minimal compared to amount of data we have.</p>
+<p>The rest of these missing values are very minimal compared to amount of data we have. We can just drop these rows since missing values make up only about 1% for these features.</p>
 
 
 </section>

@@ -5,9 +5,9 @@ For visitors and people who are new to New York, safety often comes to mind. We'
 
 A few questions that come to mind are:
 
-- What areas/boroughs are dangerous?
+- What areas/boroughs are dangerous (tend to have more crime than other areas)?
 
-- What areas are safe?
+- What areas are safe (tend to have less crime than other areas)?
 
 - What types of crimes occurred?
 
