@@ -1,1 +1,16 @@
-# Conclusion
+Overall, misdemeanors are more common than felonies. More serious crimes like rape and murder were not nearly as common as misdemeanors such as petit larceny and 2nd degree harassment. Fortunately, murder was not in the top 15 most common crimes in 2023.
+
+The Bronx had the highest crime per capita, and Manhattan is surprisingly not far behind, though a lot of Manhattan's crime is due to larceny. Staten Island has the lowest crime per capita.
+
+The streets is the most dangerous spot to hang out in, and surprisingly apartment houses was number 2, and we saw that homes show higher levels of assault and harassment. Shops and retail stores did not have a high number of crime, but these typically faced high proportions of theft as compared to assault. Outdoor areas like streets and subways had a mix of both theft and assault crimes. 
+
+The amount of crime only increased by 10% in the summer, less than expected. We were hoping to have more data from 2022 to better analyze seasonal trends. Perhaps this can be revisited in 2024 to see if the same seasonal patterns apply.
+
+Surprisingly crimes peaked in the afternoon overall, though these were typically less serious crimes such as misdemeanor harassment and larceny. This makes sense since stores are open during the day, and petit larceny is the most common crime. More serious crimes like felony assault, sex crimes, and witnessing dangerous weapons would usually happen at night, when there are fewer witnesses around.
+
+
+Suspects were most likely to be 25-44 males, and the most common race was Black. Around half the victims were female, and age groups and races were more spread out compared to suspects. This indicates younger suspects targeted more vulnerable groups for easy crimes.
+
+From the geo plots, we can see most crimes are focused in Midtown Manhattan and below Central Park. Downtown Brooklyn, Downtown Flushing and the Bronx also show high crime activity. These areas are more densely populated, and are more likely to have criminal activity.
+
+Crime can happen at any time, on any day. It's good to be aware of these stats but there's no need to be afraid. As long as you remain alert and are aware of your surroundings in the city you will be okay. Stay safe!

@@ -71,7 +71,7 @@ ggplot(df, aes(x = Date)) +
   theme_minimal()
 ```
 
-A significant proportion of the recorded crimes happened in the year 2023. We have underrepresented data in 2022, therefore we'll examine the data only in 2023.
+A significant proportion of the recorded crimes happened in the year 2023. The data from 2022 is underrepresented, therefore we'll only use data from 2023.
 
 ```{r}
 df <- df[df$Date >= as.Date('2023-01-01'), ]
@@ -129,11 +129,17 @@ ggplot(count_df_crimes, aes(x = Freq, y = reorder(OFNS_DESC, Freq), fill = LAW_C
   theme_minimal() 
 
 ```
-Petit Larceny is the highest committed crime, almost double the third highest crime. Petit Larceny means stealing goods below 1000 dollars, while Grand Larceny involves stealing goods 1000 dollars or above. There is plenty of opportunity for Larceny in New York City, especially Manhattan, due to the amount of products/goods and high population density.
+Petit Larceny is the highest committed crime, which is the act of stealing goods below 1000 dollars. There is plenty of opportunity for Larceny in New York City, especially Manhattan, due to the amount of products and shops.
 
-2nd Degree Harassment includes making physical contact in a threatening way (ex:shoving, kicking), following a person in a public place, or repeatedly engaging in annoying or alarming acts.
+The 2nd highest crime is 2nd Degree Harassment, which involves making physical contact in a threatening way (ex:shoving, kicking), following a person in a public place, or repeatedly engaging in annoying or alarming acts. 
 
-3rd Degree Assault involves causing physical injury to someone, while Felony Assault involves causing serious injury.
+Following Harassment is 3rd Degree Assault, which involves causing physical injury to someone. 
+
+Fourth highest is Grand Larceny, which involves stealing goods 1000 dollars or above.
+Felony Assault comes fifth, and this involves causing more serious physical injury.
+
+
+The most common crimes are a mix of mostly misdemeanors and felonies, however the top 3 most common crimes are misdemeanors and violations.
 
 Crime definitions from: https://www.nysenate.gov/legislation/laws/PEN/P3TJA155
 
@@ -168,7 +174,7 @@ ggplot(crime_counts, aes(x = CrimePerPop, y = reorder(Category, CrimePerPop), fi
 
 
 The Bronx has the highest crime per capita while Staten Island has the lowest.
-Manhattan also has a high crime per capita, just behind the Bronx.
+Manhattan also has a high crime per capita, just behind the Bronx. The proportion of crime severity tends to stay the same between all boroughs.
 
 
 2022 population estimates were taken from: https://www.nyc.gov/site/planning/planning-level/nyc-population/nyc-population-current-estimates.page
@@ -194,9 +200,9 @@ borough_crime_df %>%
                        just_labels=c("center","right")
                        ))
 ```
-Manhattan has higher Petit Larceny and Grand Larceny rates due to more consumer products being sold. Assault 3, Grand Larceny, and Harassment are lower probably due to a higher police presence and denser population. A lot of the crime is due to larceny, rather than assault or harassment.
+Manhattan has higher proportions of Larceny (Petit Larceny and Grand Larceny), which makes sense since it has more consumer products and stores. Assault 3, Grand Larceny, and Harassment are lower probably due to a higher police presence. It could also be due to higher density, since there would be more people walking around, which means more witnesses.
 
-The other boroughs have lower larceny rates but higher assault and harassment rates. The Bronx has more Assault and Harassment than Larceny.
+The other boroughs have lower larceny rates but higher assault and harassment rates. The Bronx has a higher proportion of Assault and Harassment than Larceny. These other boroughs have populations that are less dense and more spread out, allowing suspects to commit crimes with fewer witnesses.
 
 
 
@@ -221,10 +227,10 @@ ggplot(df[df$PREM_TYP_DESC %in% filtered_df$PREM_TYP_DESC,], aes(y = PREM_TYP_DE
   labs(title = "Frequency of Crimes at Premise",x="Frequency", y = "Premise Type", fill = "Severity") +
 scale_fill_manual(values = c("#FF0000", "#AF0000", "#3B0000"))
 ```
-The streets are a common place for crime. Stay off the streets.
-Crime has frequently happened at homes too. Don't forget to lock your doors!
+Streets not only has the most crime, but it also has the highest proportion of felonies compared to other premises, indicating it is the most dangerous.
+Crime has frequently happened at homes too, apt houses are the second most common premise for crimes, followed by houses and public housing. It makes sense apartments have a much higher crime count than houses and public housing, since apartments are a lot more common in New York. Don't forget to lock your doors!
 
-Subways are not as dangerous as people expect, probably because subways typically have a lot of people.
+Subways are not as dangerous as people expect, probably because trains typically have a lot of people, which means more witnesses. Cops can also be seen patrolling New York subways from time to time.
 
 ```{r}
 value_counts <- table(df[, c("OFNS_DESC", "PREM_TYP_DESC")])
@@ -261,7 +267,7 @@ ggplot(sorted_df, aes(x = ratio, y = reorder(factor(OFNS_DESC), ratio), fill = O
   guides(fill = FALSE) + 
   coord_cartesian(xlim = c(0, 100))
 ```
-The plots above show, the proportion of crimes in each premises types. Only the top 5 common crimes are shown. Here we can see 3 general trends: 1) Indoor shop areas such as chain stores, commercial building, department store and drug stores show disproportionately high levels of Petit Larceny. 2) Residence areas show higher levels of assaults and harrassment. 3) Outdoor areas such as streets and the subway show an almost equal mix of all types of crimes.
+The plots above show the proportion of crimes in each premise types. Only the top 5 common crimes are shown. Here we can see 3 general trends: 1) Indoor shop areas such as chain stores, commercial building, department store and drug stores show disproportionately high levels of Petit Larceny. 2) Residence areas show higher levels of assaults and harrassment. 3) Outdoor areas such as streets and the subway show an almost equal mix of all types of crimes.
 
 This suggests shoplifting is indeed a big problem in stores, causing discomfort and injury to other people is a big problem in residential areas and outdoor areas have all sorts of crimes represented similarly.
 
@@ -273,7 +279,9 @@ ggplot(df, aes(x = Month, fill = fct_rev(factor(LAW_CAT_CD)))) +
 scale_fill_manual(values = c("#EF0000", "#9F0000", "#3B0000"))
 
 ```
-Crime appears to have a slight increase during the summer months from May to August, exceeding 45000 this year. But since the difference isn't huge, we also ran a chi-squared test to check independence: 
+Crime appears to have a slight increase during the summer months from May to August, exceeding 45000. That is around a 10% increase from the Jan-April period. The proportion of severity tends to stay the same throughout the year.
+
+We also ran a chi-squared test to check independence: 
 
 ```{r}
 month_contingency_table <- table(df$Month)
@@ -283,7 +291,7 @@ month_chi_sq <- chisq.test(month_contingency_table)
 print(month_chi_sq)
 
 ```
-As you can see, the month does indeed affect the frequency of crime.
+The test resulted in a small p value, indicating that month does indeed affect the frequency of crime.
 
 ```{r}
 # Crimes over time:
@@ -301,9 +309,9 @@ ggplot(df, aes(x = factor(Hour), color = LAW_CAT_CD, group = LAW_CAT_CD)) +
   scale_x_discrete(breaks = seq(0, 24, by = 5), labels = function(x) sprintf("%02d:00", as.numeric(x))) +
   theme_minimal()
 ```
-Across all severity levels, crimes tend to peak in the afternoon around 3-5pm. There is also a spike in crime at noon. This could be due to the fact that there are more people out and more shops open in the afternoon, which gives criminals more opportunity. Overall crime tends to decline at night.
+Across all severity levels, crimes tend to peak in the afternoon around 3-5pm. There is also a spike in crime at noon. This could be due to the fact that there are more people out and more shops open in the afternoon, which gives criminals more opportunity. Crime generally declines at night.
 
-Crime is lowest at 5am, before it increases again into the morning. Let's break down the types of crime even further for more information:
+Crime is lowest at 5am, before it increases again into the morning. Let's break down these crimes even further for more information:
 
 
 ```{r}
@@ -328,7 +336,12 @@ ggplot(data_filtered, aes(x = factor(Hour), color = OFNS_DESC, group = OFNS_DESC
 ```
 
 The highest crimes (Petit Larceny, Harrassment 2, and Grand Larceny) rise from 6am, peak at noon, and have a steep decline after 3pm.
-Assault 3 typically occurs in the afternoon, with peaks at noon and 3pm. This stays relatively high at night compared to the other top crimes.
+
+It makes sense that these peak during the day, a time when people are out and shops are open. That would also explain why they decline at night after people go home. 
+
+Assault 3 typically occurs in the afternoon, with peaks at noon and 3pm. This stays relatively high at night compared to the other top crimes. Similarly, criminal mischief also tends to stay high throughout the afternoon and evening. Criminal mischief is defined as damaging property.
+
+Criminal mischief staying active at night makes sense because there would be fewer people to witness property damage.
 
 ```{r}
 # Top 6-10
@@ -357,9 +370,11 @@ ggplot(data_filtered, aes(x = factor(Hour), y=Freq, color = OFNS_DESC, group = O
   scale_x_discrete(breaks = seq(0, 24, by = 5), labels = function(x) sprintf("%02d:00", as.numeric(x))) +
   theme_minimal()
 ```
+Vehicle and Traffic Law violations peak around 7pm, which could be due to rush hour traffic.
 
-
-
+More serious crimes like robbery, felony assaults, and sex crimes are more likely to happen at night. This could be due to having fewer witnesses around.
+Dangerous weapons also peaks around midnight, possibly due to better escape options at night time. Burglary also peaks at midnight, a time when fewer people are awake to stop a suspect from breaking into a store or house.
+Grand larceny of motor vehicles peaks close to 11pm, possibly when the owner is asleep.
 
 
 ```{r}
@@ -397,7 +412,7 @@ susp_df %>%
                        just_labels=c("center","right")
                        ))
 ```
-
+Suspects were typically male in the age group 25-44. The most common race group was Black, followed by White Hispanic race.
 
 ```{r}
 vic_df <- df[!df$VIC_SEX %in% c('U', 'D', 'E', 'L'),]
@@ -436,6 +451,13 @@ vic_df %>%
                        ))
 
 ```
+Similarly, most of the victims were Black, followed by White Hispanic. The most targeted age group is 25-44, followed by 46-64. There were more victims in the 46-64 age group than suspects. And there were more suspects in the 18-24 age group than victims.
+
+There were a lot more female victims than female suspects. More Black and White Hispanic females were victims to crime as opposed to Black and White Hispanic males. Slightly more Asian and White males fell victim to crimes compared to Asian and White females.
+
+This indicates suspects target those who are more vulnerable, taking advantage of age or gender.
+
+For both victims and suspects, American Indians rarely appeared in criminal complaints in 2023.
 
 
 ```{r}
