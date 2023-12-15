@@ -261,6 +261,9 @@ ggplot(sorted_df, aes(x = ratio, y = reorder(factor(OFNS_DESC), ratio), fill = O
   guides(fill = FALSE) + 
   coord_cartesian(xlim = c(0, 100))
 ```
+The plots above show, the proportion of crimes in each premises types. Only the top 5 common crimes are shown. Here we can see 3 general trends: 1) Indoor shop areas such as chain stores, commercial building, department store and drug stores show disproportionately high levels of Petit Larceny. 2) Residence areas show higher levels of assaults and harrassment. 3) Outdoor areas such as streets and the subway show an almost equal mix of all types of crimes.
+
+This suggests shoplifting is indeed a big problem in stores, causing discomfort and injury to other people is a big problem in residential areas and outdoor areas have all sorts of crimes represented similarly.
 
 
 ```{r}
@@ -441,7 +444,7 @@ nyc_map <- map(database="nyc")
 df_geo <- df[!is.na(df$Latitude),]
 df_geo <- df_geo[df_geo$Latitude > 30,]
 ```
-
+This is just a boundar plot showing the outline of NYC.
 
 ```{r}
 
@@ -456,7 +459,7 @@ ggplot() +
   theme_void()
 ```
 
-
+The crime density has been plotted over NYC as shown above. The binsize has been set to roughly cover 5 streets and 1 avenue. From here we can immediately see that most crimes are focused in Midtown Manhattan area just below Central Park. Not only that, Downtown Brooklyn, Downtown Flushing and the Bronx also show high crime activity. These are areas of high population density and it makes sense to have higher criminal activity in densely populated areas. As opposed to this, Staten Island has low crime rates, attributable to low population density.
 
 ```{r}
 p <- ggplot() +
@@ -477,6 +480,7 @@ animated_plot <- p + transition_manual(Hour) +
 
 animate(animated_plot)
 ```
+This animation plot shows the evolution of crime rates throughout the day from 00 hour to 24 hour. As we can see, with agreement to the timeseries plot above, crime rates are highest during Noon~14 hour time, with hotspots apprearing in Midtown Manhattan, Harlem, Bronx, Downtown Brooklyn and Downton Flushing.
 
 
 ```{r}
@@ -499,7 +503,7 @@ animated_plot <- p + transition_manual(Hour) +
 
 animate(animated_plot)
 ```
-
+This animation plot has been filtered by type of offense. In this case, this plot only shows petit larceny, the most common offense in NYC. Here we can see a similar pattern as previous animation plots, where hotspots appear in Midtown Manhattan. However, now we can see more granular hotspots of petit larceny. Note the hotspot in the western boundary between Bronx and Manhattan, in Central Bronx, in Queens. These hotspots correspond to where Target stores are at. In fact, Target has announced to pull out from various locations in NYC due to shoplifting causing major losses. Also note the hour at which these hotspots get saturated, it is around 15 hour, which is the hour with the most customers in Target. It seems the more people involved, the more likely petit larceny occurs. Lower Manhattan also shows huge amounts of petit larceny during this same hour. 
 
 
 ```{r}
@@ -522,6 +526,8 @@ animated_plot <- p + transition_manual(Hour) +
 
 animate(animated_plot)
 ```
+This plot shows Harrasment instances, the second most common offense in NYC. We see this offense having hotspots in the Bronx, Brookyn and Harlem and not so much in Midtown and Downtown Manhattan. It also shows a consistent peak from 10 hour to 20 hour, which are times when people are generally active. Unlike petit larceny, the hotspots are not as focused but more spread out.
+
 
 ```{r}
 filter <- df_geo$OFNS_DESC == 'ASSAULT 3 & RELATED OFFENSES'
@@ -543,6 +549,8 @@ animated_plot <- p + transition_manual(Hour) +
 
 animate(animated_plot)
 ```
+This plot shows Misdemeanor Assaults, the 3rd most common type. This crime shows similar patterns to harrasment. This makes sense considering the similarity of Assault and Harrasment.
+
 
 ```{r}
 filter <- df_geo$OFNS_DESC == 'GRAND LARCENY'
@@ -564,6 +572,8 @@ animated_plot <- p + transition_manual(Hour) +
 
 animate(animated_plot)
 ```
+This plot shows Grand Larceny, the 4th most common type. Here we can see that Midtwon and Downtown Manhattan are hotspots for this type of crime. Considering the affluence of those regions this makes sense. It also seems to be more active during 10 hour to 20 hour, when people are generally active. 
+
 
 ```{r}
 filter <- df_geo$OFNS_DESC == 'FELONY ASSAULT'
@@ -585,7 +595,7 @@ animated_plot <- p + transition_manual(Hour) +
 
 animate(animated_plot)
 ```
-
+This plot shows Assault Felonies, the 5th most common type. Here we can see a similar pattern to Harrassment, where hotspots are located in The Bronx, Harlem, Downtown Brooklyn areas. 
 
 
 
