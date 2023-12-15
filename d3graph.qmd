@@ -1,13 +1,207 @@
 # Interactive graph
 
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Bar Chart - NYC Crimes</title>
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+</head>
+<body>
+
+<div id="bar-chart"></div>
+
+<script>
+// Sample data (replace this with your actual data)
+const data = [
+  { Borough: 'Bronx' },
+  { Borough: 'Bronx' },
+  { Borough: 'Bronx' },
+  { Borough: 'Bronx' },
+  { Borough: 'Bronx' },
+  { Borough: 'Bronx' },
+  { Borough: 'Bronx' },
+  { Borough: 'Bronx' },
+  { Borough: 'Bronx' },
+  { Borough: 'Bronx' },
+  { Borough: 'Bronx' },
+  { Borough: 'Bronx' },
+  { Borough: 'Bronx' },
+  { Borough: 'Bronx' },
+  { Borough: 'Bronx' },
+  { Borough: 'Bronx' },
+  { Borough: 'Bronx' },
+  { Borough: 'Bronx' },
+  { Borough: 'Bronx' },
+  { Borough: 'Bronx' },
+  { Borough: 'Bronx' },
+  { Borough: 'Bronx' },
+  { Borough: 'Bronx' },
+  { Borough: 'Bronx' },
+  { Borough: 'Bronx' },
+  { Borough: 'Bronx' },
+  { Borough: 'Manhattan' },
+  { Borough: 'Manhattan' },
+  { Borough: 'Manhattan' },
+  { Borough: 'Manhattan' },
+  { Borough: 'Manhattan' },
+  { Borough: 'Manhattan' },
+  { Borough: 'Manhattan' },
+  { Borough: 'Manhattan' },
+  { Borough: 'Manhattan' },
+  { Borough: 'Manhattan' },
+  { Borough: 'Manhattan' },
+  { Borough: 'Manhattan' },
+  { Borough: 'Manhattan' },
+  { Borough: 'Manhattan' },
+  { Borough: 'Manhattan' },
+  { Borough: 'Manhattan' },
+  { Borough: 'Manhattan' },
+  { Borough: 'Manhattan' },
+  { Borough: 'Manhattan' },
+  { Borough: 'Manhattan' },
+  { Borough: 'Manhattan' },
+  { Borough: 'Manhattan' },
+  { Borough: 'Manhattan' },
+  { Borough: 'Manhattan' },
+  { Borough: 'Manhattan' },
+  { Borough: 'Brooklyn' },
+  { Borough: 'Brooklyn' },
+  { Borough: 'Brooklyn' },
+  { Borough: 'Brooklyn' },
+  { Borough: 'Brooklyn' },
+  { Borough: 'Brooklyn' },
+  { Borough: 'Brooklyn' },
+  { Borough: 'Brooklyn' },
+  { Borough: 'Brooklyn' },
+  { Borough: 'Brooklyn' },
+  { Borough: 'Brooklyn' },
+  { Borough: 'Brooklyn' },
+  { Borough: 'Brooklyn' },
+  { Borough: 'Brooklyn' },
+  { Borough: 'Brooklyn' },
+  { Borough: 'Brooklyn' },
+  { Borough: 'Brooklyn' },
+  { Borough: 'Brooklyn' },
+  { Borough: 'Queens' },
+  { Borough: 'Queens' },
+  { Borough: 'Queens' },
+  { Borough: 'Queens' },
+  { Borough: 'Queens' },
+  { Borough: 'Queens' },
+  { Borough: 'Queens' },
+  { Borough: 'Queens' },
+  { Borough: 'Queens' },
+  { Borough: 'Queens' },
+  { Borough: 'Queens' },
+  { Borough: 'Queens' },
+  { Borough: 'Queens' },
+  { Borough: 'Queens' },
+  { Borough: 'Queens' },
+  { Borough: 'Queens' },
+  { Borough: 'Staten Island' },
+  { Borough: 'Staten Island' },
+  { Borough: 'Staten Island' },
+  { Borough: 'Staten Island' },
+  { Borough: 'Staten Island' },
+  { Borough: 'Staten Island' },
+  { Borough: 'Staten Island' },
+  { Borough: 'Staten Island' },
+  { Borough: 'Staten Island' },
+  { Borough: 'Staten Island' },
+  { Borough: 'Staten Island' },
+  { Borough: 'Staten Island' },
+  { Borough: 'Staten Island' },
+  { Borough: 'Staten Island' },
+  { Borough: 'Staten Island' },
+
+  // Add more data entries...
+];
+
+// Count the occurrences of each crime type
+const crimeCounts = d3.rollup(data, v => v.length, d => d.Borough);
+
+// Convert the map to an array of objects
+const crimeData = Array.from(crimeCounts, ([Borough, count]) => ({ Borough, count }));
+
+// Set up SVG dimensions
+const margin = { top: 20, right: 20, bottom: 40, left: 40 };
+const width = 600 - margin.left - margin.right;
+const height = 400 - margin.top - margin.bottom;
+
+// Create SVG container
+const svg = d3.select("#bar-chart")
+  .append("svg")
+  .attr("width", width + margin.left + margin.right)
+  .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+  .attr("transform", `translate(${margin.left},${margin.top})`);
+
+// Set up scales
+const xScale = d3.scaleBand()
+  .domain(crimeData.map(d => d.Borough))
+  .range([0, width])
+  .padding(0.1);
+
+const yScale = d3.scaleLinear()
+  .domain([0, d3.max(crimeData, d => d.count)])
+  .range([height, 0]);
+
+// Create bars for each crime type
+svg.selectAll("rect")
+  .data(crimeData)
+  .enter().append("rect")
+  .attr("x", d => xScale(d.Borough))
+  .attr("y", d => yScale(d.count))
+  .attr("width", xScale.bandwidth())
+  .attr("height", d => height - yScale(d.count))
+  .attr("fill", "steelblue")
+  .on("mouseover", handleMouseOver)
+  .on("mouseout", handleMouseOut);
+
+// Add X and Y axes
+svg.append("g")
+  .attr("transform", `translate(0,${height})`)
+  .call(d3.axisBottom(xScale));
+
+svg.append("g")
+  .call(d3.axisLeft(yScale));
+
+// Tooltip for displaying additional information on hover
+const tooltip = d3.select("body").append("div")
+  .attr("class", "tooltip")
+  .style("opacity", 0);
+
+// Mouseover event handler
+function handleMouseOver(event, d) {
+  tooltip.transition()
+    .duration(200)
+    .style("opacity", 0.9);
+  tooltip.html(`Borough: ${d.Borough}<br>Ratio: ${d.count}`)
+    .style("left", (event.pageX) + "px")
+    .style("top", (event.pageY - 28) + "px");
+}
+
+// Mouseout event handler
+function handleMouseOut() {
+  tooltip.transition()
+    .duration(500)
+    .style("opacity", 0);
+}
+</script>
+
 <style>
-  * {
-    font-family: sans-serif;
+  /* Add some styles for the tooltip */
+  .tooltip {
+    position: absolute;
+    background-color: white;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    pointer-events: none;
   }
-</style> 
+</style>
 
-<div id="plot">
-</div>
+</body>
+</html>
 
-<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-<script src="scripts/myscript.js"></script>
