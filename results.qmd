@@ -1,7 +1,14 @@
+---
+execute:
+  echo: true
+  warning: false
+---
+
+
 # Results
 ```{r}
-#install.packages('nycmaps')
-#devtools::install_github("zachcp/nycmaps")
+# install.packages('nycmaps')
+# devtools::install_github("zachcp/nycmaps")
 #install.packages('pak')
 #pak::pak('thomasp85/gganimate')
 #install.packages('gapminder')
@@ -23,7 +30,7 @@ library(gifski)
 library(gganimate)
 library(gapminder)
 
-origin_df <- read.csv('../NYPD_Complaint_Data_Current__Year_To_Date_.csv')
+origin_df <- read.csv('NYPD_Complaint_Data_Current__Year_To_Date_.csv')
 origin_df[origin_df == "(null)"] <- NA
 origin_df[origin_df == "UNKNOWN"] <- NA
 ```
@@ -64,6 +71,8 @@ ggplot(df, aes(x = Date)) +
   theme_minimal()
 ```
 
+A significant proportion of the recorded crimes happened in the year 2023. We have underrepresented data in 2022, therefore we'll examine the data only in 2023.
+
 ```{r}
 df <- df[df$Date >= as.Date('2023-01-01'), ]
 df$Month <- month(df$Date)
@@ -72,77 +81,67 @@ df$Month <- factor(month.name[df$Month], levels = month.name)
 # df
 ```
 
-
 ```{r}
-ggplot(df, aes(x = Month, fill = fct_rev(factor(LAW_CAT_CD)))) +
-  geom_bar() +
-  labs(title = "Crimes per month", x = "Month", y = "Frequency", fill = "Severity") +
-scale_fill_manual(values = c("#BF0000", "#7F0000", "#3B0000"))
+value_counts <- table(df$LAW_CAT_CD)
 
-# ggplot(data = df, aes(x=Month)) +
-#   geom_bar(color = "black") +
-#   labs(title='Crimes per month faceted by offense') +
-#   geom_text(stat = "count", aes(label=after_stat(count)), vjust = -0.25, size = 3) +
-#   facet_wrap(facets = vars(LAW_CAT_CD), nrow = 3) +  # , scales = "free_y" ?
-#   ylim(0, 27500) +
-#   theme_bw()
+count_df <- data.frame(Category = names(value_counts), Count = as.numeric(value_counts))
+count_df <- count_df[count_df$Count > 0,]
 
 
+ggplot(count_df, aes(y = Count, x = Category)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Frequency of Crimes by Severity",
+       y = "Frequency",
+       x = "Crime Severity") +
+  theme_minimal() 
 ```
 
 
-```{r}
-month_contingency_table <- table(df$Month)
-month_contingency_table <- month_contingency_table[month_contingency_table>0]
+Felony: The most serious types of crimes. Examples of felonies include murder, rape, robbery, arson, and selling/possessing controlled substances. It is punishable by imprisonment for more than one year, or as long as life imprisonment.
 
-month_chi_sq <- chisq.test(month_contingency_table)
-# print(month_contingency_table)
-print(month_chi_sq)
+Misdemeanor: A misdemeanor is the lowest level of crime. It is more serious than a violation, but less serious than a felony. It is a crime punishable by probation, a fine, or up to one year in jail.
 
-```
+Violation: Any non-criminal offense, other than traffic infractions. An offense punishable by up to a $250 fine or up to 15 days in jail. Examples of common violations include disorderly conduct and trespassing.
 
 
-```{r}
-ggplot(df, aes(x = factor(Hour), color = LAW_CAT_CD, group = LAW_CAT_CD)) +
-  geom_point(stat = "count", size = 3) +
-  geom_line(stat = "count", aes(group = LAW_CAT_CD), size = 1) +
-  labs(title = "Crimes over time",
-       x = "Time (Hour)", y = "Count", fill="Severity") +
-  scale_color_manual(values = c( "#3B0000", "#AF0000", "#FF0000")) +
-  scale_x_discrete(breaks = seq(0, 24, by = 5), labels = function(x) sprintf("%02d:00", as.numeric(x))) +
-  theme_minimal()
-```
+Misdemeanors make up the highest proportion of crimes. This includes less serious crimes with lighter punishments, so people may be more willing to risk attempting these types of crimes. 
+
+
+Definitions from:
+https://www.nycourts.gov/courthelp/criminal/typesCriminalCases.shtml
+https://www.nyc.gov/site/nypd/services/victim-services/glossary.page
 
 ```{r}
-ggplot(df, aes(x = factor(Hour), color = LAW_CAT_CD, group = LAW_CAT_CD)) +
-  geom_point(stat = "count", size = 3) +
-  geom_line(stat = "count", aes(group = LAW_CAT_CD), size = 1) +
-  labs(title = "Crimes over time",
-       x = "Time (Hour)", y = "Count", fill="Severity") +
-  scale_color_manual(values = c( "#3B0000", "#AF0000", "#FF0000")) +
-  scale_x_discrete(breaks = seq(0, 24, by = 5), labels = function(x) sprintf("%02d:00", as.numeric(x))) +
-  theme_minimal()
+value_counts <- table(df[, c("OFNS_DESC", "LAW_CAT_CD")])
+count_df_crimes <- data.frame(value_counts)
+count_df_crimes$OFNS_DESC <- paste(count_df_crimes$OFNS_DESC, count_df_crimes$LAW_CAT_CD, sep = " ")
+count_df_crimes <- count_df_crimes[count_df_crimes$Freq > 4000,]
+
+count_df_crimes <- count_df_crimes[order(count_df_crimes$Freq), ]
+
+ggplot(count_df_crimes, aes(x = Freq, y = reorder(OFNS_DESC, Freq), fill = LAW_CAT_CD)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Most Common Crimes",
+       y = "Crime Type",
+       x = "Frequency",
+       fill="Severity") +
+  scale_fill_manual(values = c( "#3B0000", "#AF0000", "#FF0000")) +
+  theme_minimal() 
+
 ```
+Petit Larceny is the highest committed crime, almost double the third highest crime. Petit Larceny means stealing goods below 1000 dollars, while Grand Larceny involves stealing goods 1000 dollars or above. There is plenty of opportunity for Larceny in New York City, especially Manhattan, due to the amount of products/goods and high population density.
 
+2nd Degree Harassment includes making physical contact in a threatening way (ex:shoving, kicking), following a person in a public place, or repeatedly engaging in annoying or alarming acts.
 
+3rd Degree Assault involves causing physical injury to someone, while Felony Assault involves causing serious injury.
 
-2022 population estimates were taken from: https://www.nyc.gov/site/planning/planning-level/nyc-population/nyc-population-current-estimates.page
+Crime definitions from: https://www.nysenate.gov/legislation/laws/PEN/P3TJA155
 
 ```{r}
 value_counts <- table(df$BORO_NM)
 count_df <- data.frame(Category = names(value_counts), Count = as.numeric(value_counts))
 population <- c(1379946, 2590516, 1596273, 2278029, 491133)
 count_df$Pop <- population
-count_df$CrimePerPop <- count_df$Count*100 / count_df$Pop
-count_df <- count_df[count_df$CrimePerPop > 0,]
-count_df <- count_df[order(count_df$CrimePerPop), ]
-# ggplot(count_df, aes(x = CrimePerPop, y = reorder(Category, CrimePerPop))) +
-#   geom_bar(stat = "identity", fill = "skyblue") +
-#   labs(title = "Ratio of Crimes to population by Borough",
-#        x = "Crime/Capita ()",
-#        y = "Borough") +
-#   theme_minimal()
-
 
 crime_counts <- df %>%
   group_by(BORO_NM, LAW_CAT_CD) %>%
@@ -168,63 +167,38 @@ ggplot(crime_counts, aes(x = CrimePerPop, y = reorder(Category, CrimePerPop), fi
 ```
 
 
+The Bronx has the highest crime per capita while Staten Island has the lowest.
+Manhattan also has a high crime per capita, just behind the Bronx.
 
 
-
-```{r}
-value_counts <- table(df$LAW_CAT_CD)
-
-count_df <- data.frame(Category = names(value_counts), Count = as.numeric(value_counts))
-count_df <- count_df[count_df$Count > 0,]
-
-
-ggplot(count_df, aes(y = Count, x = Category)) +
-  geom_bar(stat = "identity", fill = "skyblue") +
-  labs(title = "Frequency of Crimes by Severity",
-       y = "Frequency",
-       x = "Crime Severity") +
-  theme_minimal() 
-```
-According to nycourts.gov and nyc.gov, these are the definitions of the different severity levels:
-https://www.nycourts.gov/courthelp/criminal/typesCriminalCases.shtml
-https://www.nyc.gov/site/nypd/services/victim-services/glossary.page
-
-Violation: Any non-criminal offense, other than traffic infractions. An offense punishable by up to a $250 fine or up to 15 days in jail. Examples of common violations include disorderly conduct and trespassing.
-
-Misdemeanor: A misdemeanor is the lowest level of crime. It is more serious than a violation, but less serious than a felony. It is a crime punishable by probation, a fine, or up to one year in jail.
-
-Felony: The most serious types of crimes. Examples of felonies include murder, rape, robbery, arson, and selling/possessing controlled substances. It is punishable by imprisonment for more than one year, or as long as life imprisonment.
-
-```{r}
-value_counts <- table(df[, c("OFNS_DESC", "LAW_CAT_CD")])
-count_df <- data.frame(value_counts)
-count_df$OFNS_DESC <- paste(count_df$OFNS_DESC, count_df$LAW_CAT_CD, sep = " ")
-count_df <- count_df[count_df$Freq > 4000,]
-
-count_df <- count_df[order(count_df$Freq), ]
-```
+2022 population estimates were taken from: https://www.nyc.gov/site/planning/planning-level/nyc-population/nyc-population-current-estimates.page
 
 
 ```{r}
-value_counts <- table(df[, c("OFNS_DESC", "LAW_CAT_CD")])
-count_df <- data.frame(value_counts)
-count_df$OFNS_DESC <- paste(count_df$OFNS_DESC, count_df$LAW_CAT_CD, sep = " ")
-count_df <- count_df[count_df$Freq > 7000,]
+top_crimes <- count_df_crimes %>% tail(5)
+top_crimes$OFNS_DESC <- str_remove(top_crimes$OFNS_DESC, "\\s+\\w+$")
+borough_crime_df <- df[df$OFNS_DESC %in% top_crimes$OFNS_DESC,]
+borough_crime_df$OFNS_DESC <- factor(borough_crime_df$OFNS_DESC, levels = top_crimes$OFNS_DESC)
 
-count_df <- count_df[order(count_df$Freq), ]
-count_df$OFNS_DESC <- str_wrap(count_df$OFNS_DESC, width = 30)
-
-ggplot(count_df, aes(x = Freq, y = reorder(OFNS_DESC, Freq), fill = LAW_CAT_CD)) +
-  geom_bar(stat = "identity") +
-  labs(title = "Most Common Crimes",
-       y = "Crime Type",
-       x = "Frequency",
-       fill="Severity") +
-  scale_fill_manual(values = c( "#3B0000", "#AF0000", "#FF0000")) +
-  theme_minimal() 
-
+borough_crime_df %>%
+  vcd::mosaic(OFNS_DESC ~ BORO_NM, 
+              data = .,
+              direction = c("v", "h"),
+              main = 'Proportion of top 5 crimes in boroughs',
+              labeling = labeling_border(
+                      xlab = "lab",
+                       gp_labels = gpar(fontsize = 8),
+                       rot_labels = c(30,0,0,0),
+                       offset_label =c(1,0,0,0),
+                       varnames = c(FALSE, FALSE),
+                       just_labels=c("center","right")
+                       ))
 ```
-Larceny more likely to occur during the day when stores are open. Same with harassment since there are more people walking around.
+Manhattan has higher Petit Larceny and Grand Larceny rates due to more consumer products being sold. Assault 3, Grand Larceny, and Harassment are lower probably due to a higher police presence and denser population. A lot of the crime is due to larceny, rather than assault or harassment.
+
+The other boroughs have lower larceny rates but higher assault and harassment rates. The Bronx has more Assault and Harassment than Larceny.
+
+
 
 ```{r}
 value_counts <- table(df$PREM_TYP_DESC)
@@ -234,14 +208,6 @@ count_df <- count_df[count_df$Count > 7000,]
 
 
 count_df <- count_df[order(count_df$Count), ]
-
-
-# ggplot(count_df, aes(x = Count, y = reorder(Category, Count))) +
-#   geom_bar(stat = "identity", fill = "skyblue") +
-#   labs(title = "Frequency of Crimes at Premise Type",
-#        x = "Frequency",
-#        y = "Premise Type") +
-#   theme_minimal() 
 
 
 count_premise_df <- df %>% count(PREM_TYP_DESC)
@@ -255,6 +221,10 @@ ggplot(df[df$PREM_TYP_DESC %in% filtered_df$PREM_TYP_DESC,], aes(y = PREM_TYP_DE
   labs(title = "Frequency of Crimes at Premise",x="Frequency", y = "Premise Type", fill = "Severity") +
 scale_fill_manual(values = c("#FF0000", "#AF0000", "#3B0000"))
 ```
+The streets are a common place for crime. Stay off the streets.
+Crime has frequently happened at homes too. Don't forget to lock your doors!
+
+Subways are not as dangerous as people expect, probably because subways typically have a lot of people.
 
 ```{r}
 value_counts <- table(df[, c("OFNS_DESC", "PREM_TYP_DESC")])
@@ -293,16 +263,101 @@ ggplot(sorted_df, aes(x = ratio, y = reorder(factor(OFNS_DESC), ratio), fill = O
 ```
 
 
+```{r}
+ggplot(df, aes(x = Month, fill = fct_rev(factor(LAW_CAT_CD)))) +
+  geom_bar() +
+  labs(title = "Crimes per month", x = "Month", y = "Frequency", fill = "Severity") +
+scale_fill_manual(values = c("#EF0000", "#9F0000", "#3B0000"))
 
+```
+Crime appears to have a slight increase during the summer months from May to August, exceeding 45000 this year. But since the difference isn't huge, we also ran a chi-squared test to check independence: 
 
+```{r}
+month_contingency_table <- table(df$Month)
+month_contingency_table <- month_contingency_table[month_contingency_table>0]
+# print(month_contingency_table)
+month_chi_sq <- chisq.test(month_contingency_table)
+print(month_chi_sq)
 
+```
+As you can see, the month does indeed affect the frequency of crime.
 
+```{r}
+# Crimes over time:
+
+value_counts <- table(df[, c("OFNS_DESC", "Hour")])
+crime_df <- data.frame(value_counts)
+
+# Severity
+ggplot(df, aes(x = factor(Hour), color = LAW_CAT_CD, group = LAW_CAT_CD)) +
+  geom_point(stat = "count", size = 3) +
+  geom_line(stat = "count", size = 1) +
+  labs(title = "Crimes over time (Severity)",
+       x = "Time (Hour)", y = "Count", colour="Severity") +
+  scale_color_manual(values = c( "#3B0000", "#AF0000", "#FF0000")) +
+  scale_x_discrete(breaks = seq(0, 24, by = 5), labels = function(x) sprintf("%02d:00", as.numeric(x))) +
+  theme_minimal()
+```
+Across all severity levels, crimes tend to peak in the afternoon around 3-5pm. There is also a spike in crime at noon. This could be due to the fact that there are more people out and more shops open in the afternoon, which gives criminals more opportunity. Overall crime tends to decline at night.
+
+Crime is lowest at 5am, before it increases again into the morning. Let's break down the types of crime even further for more information:
 
 
 ```{r}
-# susp_sex_df <- df[df$SUSP_SEX != 'U',]
-# mosaicplot(table(susp_sex_df$LAW_CAT_CD, susp_sex_df$SUSP_SEX), main = "Mosaic Plot of Suspect Age and Crime Category", color = c("salmon", "lightblue"))
+# Top 5
+top_categories <- df %>%
+  group_by(OFNS_DESC) %>%
+  summarise(Count = n()) %>%
+  arrange(desc(Count))
+  
+top_5 <- top_categories %>% head(5)
+data_filtered <- df %>%
+  filter(OFNS_DESC %in% top_5$OFNS_DESC)
+
+
+ggplot(data_filtered, aes(x = factor(Hour), color = OFNS_DESC, group = OFNS_DESC)) +
+  geom_point(stat = "count", size = 2, alpha=0.5) +
+  geom_line(stat = "count", size = 0.5) +
+  labs(title = "Crimes over time (Top 5 most common offenses)",
+       x = "Time (Hour)", y = "Count", colour="Offense") +
+  scale_x_discrete(breaks = seq(0, 24, by = 5), labels = function(x) sprintf("%02d:00", as.numeric(x))) +
+  theme_minimal()
 ```
+
+The highest crimes (Petit Larceny, Harrassment 2, and Grand Larceny) rise from 6am, peak at noon, and have a steep decline after 3pm.
+Assault 3 typically occurs in the afternoon, with peaks at noon and 3pm. This stays relatively high at night compared to the other top crimes.
+
+```{r}
+# Top 6-10
+subset_crimes <- top_categories %>% slice(6:10)
+data_filtered <- crime_df %>%
+  filter(OFNS_DESC %in% subset_crimes$OFNS_DESC)
+
+ggplot(data_filtered, aes(x = factor(Hour), y=Freq, color = OFNS_DESC, group = OFNS_DESC)) +
+  geom_line(stat = "smooth", method = "loess", size = 0.7) +
+  labs(title = "Crimes over time (Top 6-10)",
+       x = "Time (Hour)", y = "Count", colour="Offense") +
+  scale_x_discrete(breaks = seq(0, 24, by = 5), labels = function(x) sprintf("%02d:00", as.numeric(x))) +
+  theme_minimal()
+
+
+
+# Top 11-15
+subset_crimes <- top_categories %>% slice(11:15)
+data_filtered <- crime_df %>%
+  filter(OFNS_DESC %in% subset_crimes$OFNS_DESC)
+
+ggplot(data_filtered, aes(x = factor(Hour), y=Freq, color = OFNS_DESC, group = OFNS_DESC)) +
+  geom_line(stat = "smooth", method = "loess", size = 0.7) +
+  labs(title = "Crimes over time (Top 11-15)",
+       x = "Time (Hour)", y = "Count", colour="Offense") +
+  scale_x_discrete(breaks = seq(0, 24, by = 5), labels = function(x) sprintf("%02d:00", as.numeric(x))) +
+  theme_minimal()
+```
+
+
+
+
 
 ```{r}
 susp_df <- df[df$SUSP_SEX != 'U',]

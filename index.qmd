@@ -1,7 +1,7 @@
 # Introduction
 
 
-For visitors and people who are new to New York, safety often comes to mind. We'd like to identify any trends to see which areas/boroughs are actually dangerous. We are especially curious about this since we are also new to the city.
+For visitors and people who are new to New York City, safety often comes to mind. We'd like to identify any trends to see which areas/boroughs are actually dangerous. We are especially curious about this since we are also new to the city.
 
 A few questions that come to mind are:
 
@@ -14,7 +14,5 @@ A few questions that come to mind are:
 - Are there seasonal patterns or trends over time when crimes occurred?
 
 - Are there patterns in the premises these crimes occurred in?
-
-- How effective are different types of authorities in responding and stopping these crimes?
 
 - What groups are frequently targeted?
