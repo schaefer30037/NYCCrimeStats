@@ -1,5 +1,12 @@
 # Results
 ```{r}
+#install.packages('nycmaps')
+#devtools::install_github("zachcp/nycmaps")
+#install.packages('pak')
+#pak::pak('thomasp85/gganimate')
+#install.packages('gapminder')
+#install.packages("gifski")
+#install.packages('png')
 library(vcdExtra)
 library(ggplot2)
 library(dplyr)
@@ -8,8 +15,15 @@ library(vcd)
 library(stringr)
 library(lubridate)
 library(forcats)
+library(nycmaps)
+library(maps)
+library(viridis)
+library(png)
+library(gifski)
+library(gganimate)
+library(gapminder)
 
-origin_df <- read.csv('NYPD_Complaint_Data_Current__Year_To_Date_.csv')
+origin_df <- read.csv('../NYPD_Complaint_Data_Current__Year_To_Date_.csv')
 origin_df[origin_df == "(null)"] <- NA
 origin_df[origin_df == "UNKNOWN"] <- NA
 ```
@@ -99,6 +113,18 @@ ggplot(df, aes(x = factor(Hour), color = LAW_CAT_CD, group = LAW_CAT_CD)) +
   theme_minimal()
 ```
 
+```{r}
+ggplot(df, aes(x = factor(Hour), color = LAW_CAT_CD, group = LAW_CAT_CD)) +
+  geom_point(stat = "count", size = 3) +
+  geom_line(stat = "count", aes(group = LAW_CAT_CD), size = 1) +
+  labs(title = "Crimes over time",
+       x = "Time (Hour)", y = "Count", fill="Severity") +
+  scale_color_manual(values = c( "#3B0000", "#AF0000", "#FF0000")) +
+  scale_x_discrete(breaks = seq(0, 24, by = 5), labels = function(x) sprintf("%02d:00", as.numeric(x))) +
+  theme_minimal()
+```
+
+
 
 2022 population estimates were taken from: https://www.nyc.gov/site/planning/planning-level/nyc-population/nyc-population-current-estimates.page
 
@@ -169,8 +195,6 @@ Misdemeanor: A misdemeanor is the lowest level of crime. It is more serious than
 
 Felony: The most serious types of crimes. Examples of felonies include murder, rape, robbery, arson, and selling/possessing controlled substances. It is punishable by imprisonment for more than one year, or as long as life imprisonment.
 
-
-
 ```{r}
 value_counts <- table(df[, c("OFNS_DESC", "LAW_CAT_CD")])
 count_df <- data.frame(value_counts)
@@ -178,6 +202,17 @@ count_df$OFNS_DESC <- paste(count_df$OFNS_DESC, count_df$LAW_CAT_CD, sep = " ")
 count_df <- count_df[count_df$Freq > 4000,]
 
 count_df <- count_df[order(count_df$Freq), ]
+```
+
+
+```{r}
+value_counts <- table(df[, c("OFNS_DESC", "LAW_CAT_CD")])
+count_df <- data.frame(value_counts)
+count_df$OFNS_DESC <- paste(count_df$OFNS_DESC, count_df$LAW_CAT_CD, sep = " ")
+count_df <- count_df[count_df$Freq > 7000,]
+
+count_df <- count_df[order(count_df$Freq), ]
+count_df$OFNS_DESC <- str_wrap(count_df$OFNS_DESC, width = 30)
 
 ggplot(count_df, aes(x = Freq, y = reorder(OFNS_DESC, Freq), fill = LAW_CAT_CD)) +
   geom_bar(stat = "identity") +
@@ -231,16 +266,24 @@ result <- count_df %>%
 
 count_df <- merge(count_df, result, by = "PREM_TYP_DESC")
 count_df$ratio <- count_df$Freq*100 / count_df$total_value
-count_df <- count_df[count_df$total_value > 7000,]
-count_df <- count_df[count_df$ratio > 12,]
-count_df$OFNS_DESC <- str_wrap(count_df$OFNS_DESC, width = 10)
-count_df$PREM_TYP_DESC <- str_wrap(count_df$PREM_TYP_DESC, width = 10)
+count_df <- count_df[count_df$total_value > 8000,]
+count_df <- count_df[count_df$ratio > 0,]
 
-ggplot(count_df, aes(x = ratio, y = OFNS_DESC, fill = OFNS_DESC)) +
+sorted_df <- count_df %>%
+  group_by(PREM_TYP_DESC) %>%
+  arrange(desc(ratio)) %>%
+  slice_head(n = 5)
+
+sorted_df$OFNS_DESC <- str_sub(sorted_df$OFNS_DESC, end = 15)
+sorted_df$PREM_TYP_DESC <- str_wrap(sorted_df$PREM_TYP_DESC, width = 15)
+sorted_df <- sorted_df %>% arrange(ratio)
+
+
+
+ggplot(sorted_df, aes(x = ratio, y = reorder(factor(OFNS_DESC), ratio), fill = OFNS_DESC)) +
   geom_bar(stat = "identity", position = "dodge") +
-  facet_wrap(~PREM_TYP_DESC, scales = "free",ncol = 4) +
-  labs(title = "Proportion of offense types across premises", x = "Percent(%)", y = "Type of Offense") +
-  theme_minimal() + 
+  facet_wrap(~PREM_TYP_DESC, scales = "free",ncol = 3) +
+  labs(title = "Proportion of 5 most common offense across 9 highest crime rate premises", x = "Percent(%)", y = "Type of Offense") +
   theme( 
         strip.text = element_text(size = 7), 
         axis.text.y = element_text(size = 7)
@@ -254,10 +297,13 @@ ggplot(count_df, aes(x = ratio, y = OFNS_DESC, fill = OFNS_DESC)) +
 
 
 
+
+
 ```{r}
 # susp_sex_df <- df[df$SUSP_SEX != 'U',]
 # mosaicplot(table(susp_sex_df$LAW_CAT_CD, susp_sex_df$SUSP_SEX), main = "Mosaic Plot of Suspect Age and Crime Category", color = c("salmon", "lightblue"))
 ```
+
 ```{r}
 susp_df <- df[df$SUSP_SEX != 'U',]
 susp_df <- susp_df[susp_df$SUSP_AGE_GROUP %in% c('<18','18-24','25-44','45-64', '65+'),]
@@ -332,4 +378,160 @@ vic_df %>%
                        ))
 
 ```
+
+
+```{r}
+nyc_map <- map(database="nyc")
+
+df_geo <- df[!is.na(df$Latitude),]
+df_geo <- df_geo[df_geo$Latitude > 30,]
+```
+
+
+```{r}
+
+ggplot() +
+  geom_polygon(data=nyc_map, aes(x = long, y = lat, group = group),
+               fill = "grey", color = "black") + 
+  geom_bin2d(data=df_geo, aes(x = Longitude, y = Latitude), 
+            binwidth = c(0.004, 0.004), alpha=0.9) +
+  scale_fill_gradientn(colors = inferno(100), 
+                       name = "Density",limits = c(-100, 1500)) +
+  coord_fixed(ratio = 1.2) +
+  theme_void()
+```
+
+
+
+```{r}
+p <- ggplot() +
+  geom_polygon(data=nyc_map, aes(x = long, y = lat, group = group),
+               fill = "grey", color = "black") + 
+  geom_bin2d(data=df_geo, aes(x = Longitude, y = Latitude), 
+            binwidth = c(0.004, 0.004), alpha=0.9) +
+  scale_fill_gradientn(colors = inferno(100), 
+                       name = "Count/Pixel",limits = c(-10, 100)) +
+  coord_fixed(ratio = 1.2) +
+  theme_void() +
+  labs(title = "Hour: {frame}")
+  
+# Here comes the gganimate specific bits
+animated_plot <- p + transition_manual(Hour) +
+  enter_fade() +
+  exit_fade()
+
+animate(animated_plot)
+```
+
+
+```{r}
+filter <- df_geo$OFNS_DESC == 'PETIT LARCENY'
+p <- ggplot() +
+  geom_polygon(data=nyc_map, aes(x = long, y = lat, group = group),
+               fill = "grey", color = "black") + 
+  geom_bin2d(data=df_geo[filter, ], aes(x = Longitude, y = Latitude), 
+            binwidth = c(0.004, 0.004), alpha=0.9) +
+  scale_fill_gradientn(colors = inferno(100), 
+                       name = "Petit Larceny/Pixel",limits = c(-5, 40)) +
+  coord_fixed(ratio = 1.2) +
+  theme_void() +
+  labs(title = "Hour: {frame}")
+  
+# Here comes the gganimate specific bits
+animated_plot <- p + transition_manual(Hour) +
+  enter_fade() +
+  exit_fade()
+
+animate(animated_plot)
+```
+
+
+
+```{r}
+filter <- df_geo$OFNS_DESC == 'HARRASSMENT 2'
+p <- ggplot() +
+  geom_polygon(data=nyc_map, aes(x = long, y = lat, group = group),
+               fill = "grey", color = "black") + 
+  geom_bin2d(data=df_geo[filter, ], aes(x = Longitude, y = Latitude), 
+            binwidth = c(0.004, 0.004), alpha=0.9) +
+  scale_fill_gradientn(colors = inferno(100), 
+                       name = "Harrassment/Pixel",limits = c(-1, 10)) +
+  coord_fixed(ratio = 1.2) +
+  theme_void() +
+  labs(title = "Hour: {frame}")
+  
+# Here comes the gganimate specific bits
+animated_plot <- p + transition_manual(Hour) +
+  enter_fade() +
+  exit_fade()
+
+animate(animated_plot)
+```
+
+```{r}
+filter <- df_geo$OFNS_DESC == 'ASSAULT 3 & RELATED OFFENSES'
+p <- ggplot() +
+  geom_polygon(data=nyc_map, aes(x = long, y = lat, group = group),
+               fill = "grey", color = "black") + 
+  geom_bin2d(data=df_geo[filter, ], aes(x = Longitude, y = Latitude), 
+            binwidth = c(0.004, 0.004), alpha=0.9) +
+  scale_fill_gradientn(colors = inferno(100), 
+                       name = "Misdemeanor Assault/Pixel",limits = c(-1, 10)) +
+  coord_fixed(ratio = 1.2) +
+  theme_void() +
+  labs(title = "Hour: {frame}")
+  
+# Here comes the gganimate specific bits
+animated_plot <- p + transition_manual(Hour) +
+  enter_fade() +
+  exit_fade()
+
+animate(animated_plot)
+```
+
+```{r}
+filter <- df_geo$OFNS_DESC == 'GRAND LARCENY'
+p <- ggplot() +
+  geom_polygon(data=nyc_map, aes(x = long, y = lat, group = group),
+               fill = "grey", color = "black") + 
+  geom_bin2d(data=df_geo[filter, ], aes(x = Longitude, y = Latitude), 
+            binwidth = c(0.004, 0.004), alpha=0.9) +
+  scale_fill_gradientn(colors = inferno(100), 
+                       name = "Grand Larceny/Pixel",limits = c(-1, 10)) +
+  coord_fixed(ratio = 1.2) +
+  theme_void() +
+  labs(title = "Hour: {frame}")
+  
+# Here comes the gganimate specific bits
+animated_plot <- p + transition_manual(Hour) +
+  enter_fade() +
+  exit_fade()
+
+animate(animated_plot)
+```
+
+```{r}
+filter <- df_geo$OFNS_DESC == 'FELONY ASSAULT'
+p <- ggplot() +
+  geom_polygon(data=nyc_map, aes(x = long, y = lat, group = group),
+               fill = "grey", color = "black") + 
+  geom_bin2d(data=df_geo[filter, ], aes(x = Longitude, y = Latitude), 
+            binwidth = c(0.004, 0.004), alpha=0.9) +
+  scale_fill_gradientn(colors = inferno(100), 
+                       name = "Felony Assault/Pixel",limits = c(-1, 10)) +
+  coord_fixed(ratio = 1.2) +
+  theme_void() +
+  labs(title = "Hour: {frame}")
+  
+# Here comes the gganimate specific bits
+animated_plot <- p + transition_manual(Hour) +
+  enter_fade() +
+  exit_fade()
+
+animate(animated_plot)
+```
+
+
+
+
 
