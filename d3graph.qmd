@@ -87,9 +87,8 @@ p <- ggplot() +
   scale_fill_gradientn(colors = inferno(100), 
                        name = "Count/Pixel",limits = c(-10, 100)) +
   coord_fixed(ratio = 1.2) +
-  labs(title = "Crime Rates over time") +
-  theme_void() +
-  labs(title = "Hour: {frame}")
+  labs(title = "Crime Rates over hour: {frame}") +
+  theme_void() 
   
 # Here comes the gganimate specific bits
 animated_plot <- p + transition_manual(Hour) +
@@ -111,9 +110,8 @@ p <- ggplot() +
   scale_fill_gradientn(colors = inferno(100), 
                        name = "Petit Larceny/Pixel",limits = c(-5, 40)) +
   coord_fixed(ratio = 1.2) +
-  labs(title = "Petit Larceny over time") +
-  theme_void() +
-  labs(title = "Hour: {frame}")
+  labs(title = "Petit Larceny over hour: {frame}") +
+  theme_void() 
   
 # Here comes the gganimate specific bits
 animated_plot <- p + transition_manual(Hour) +
@@ -135,9 +133,8 @@ p <- ggplot() +
   scale_fill_gradientn(colors = inferno(100), 
                        name = "Harrassment/Pixel",limits = c(-1, 10)) +
   coord_fixed(ratio = 1.2) +
-  labs(title = "Harassment over time") +
-  theme_void() +
-  labs(title = "Hour: {frame}")
+  labs(title = "Harassment over hour: {frame}") +
+  theme_void() 
   
 # Here comes the gganimate specific bits
 animated_plot <- p + transition_manual(Hour) +
@@ -159,9 +156,8 @@ p <- ggplot() +
   scale_fill_gradientn(colors = inferno(100), 
                        name = "Misdemeanor Assault/Pixel",limits = c(-1, 10)) +
   coord_fixed(ratio = 1.2) +
-  labs(title = "Misdemeanor Assault over time") +
-  theme_void() +
-  labs(title = "Hour: {frame}")
+  labs(title = "Misdemeanor Assault over hour: {frame}") +
+  theme_void() 
   
 # Here comes the gganimate specific bits
 animated_plot <- p + transition_manual(Hour) +
@@ -183,10 +179,9 @@ p <- ggplot() +
   scale_fill_gradientn(colors = inferno(100), 
                        name = "Grand Larceny/Pixel",limits = c(-1, 10)) +
   coord_fixed(ratio = 1.2) +
-  labs(title = "Grand Larceny over time") +
-  theme_void() +
-  labs(title = "Hour: {frame}")
-  
+  labs(title = "Grand Larceny over hour: {frame}") +
+  theme_void()
+
 # Here comes the gganimate specific bits
 animated_plot <- p + transition_manual(Hour) +
   enter_fade() +
@@ -207,9 +202,8 @@ p <- ggplot() +
   scale_fill_gradientn(colors = inferno(100), 
                        name = "Felony Assault/Pixel",limits = c(-1, 10)) +
   coord_fixed(ratio = 1.2) +
-  labs(title = "Assault Felonies over time") +
-  theme_void() +
-  labs(title = "Hour: {frame}")
+  labs(title = "Assault Felonies over hour: {frame}") +
+  theme_void()
   
 # Here comes the gganimate specific bits
 animated_plot <- p + transition_manual(Hour) +
