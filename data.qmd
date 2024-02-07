@@ -178,8 +178,20 @@ ggplot(plot_data_sum[plot_data_sum$missing_count > 0 & plot_data_sum$missing_cou
 
 The rest of these missing values are very minimal compared to amount of data we have. We can just drop these rows since missing values make up only about 1% for these features.
 
+```{r}
 
+df$Date <- as.Date(df$CMPLNT_FR_DT, format = "%m/%d/%Y")
 
+df <- df[order(df$Date), ]
+
+ggplot(df, aes(x = Date)) +
+  geom_histogram(binwidth = 7, fill = "skyblue", color = "black", alpha = 0.7) +
+  geom_vline(xintercept = as.Date("2023-01-01"), linetype = "dashed", color = "red", linewidth = 1) +
+  labs(title = "Date Counts Histogram", x = "Date", y = "Count") +
+  xlim(as.Date('2022-01-01'), max(df$Date)) +
+  theme_minimal()
+```
+A significant proportion of the recorded crimes happened in the year 2023. The data from 2022 is underrepresented, therefore we'll only use data from 2023.
 
 
 
