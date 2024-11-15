@@ -3,4 +3,4 @@ We'd like to identify any trends in the crime and safety across New York City ba
 
 We hope to help the public make informed decisions based on our analysis.
 
-https://schaefer30037.github.io/NYCCrimeStats/
+**Please check out our website here: https://schaefer30037.github.io/NYCCrimeStats/**
